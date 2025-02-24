@@ -1,0 +1,158 @@
+/* General Body Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+
+/* Status Badges */
+.badge-success {
+    background-color: #28a745 !important; /* Green for delivered */
+}
+
+.badge-warning {
+    background-color: #ffc107 !important; /* Yellow for picked up */
+    color: black;
+}
+
+.badge-danger {
+    background-color: #dc3545 !important; /* Red for cancelled */
+}
+
+.badge-secondary {
+    background-color: #6c757d !important; /* Gray for other statuses */
+}
+
+/* Card Styling */
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.card-header {
+    background-color: #32b67b; /* A vibrant green for the header */
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    border-radius: 15px 15px 0 0;
+}
+
+/* Table Styling */
+.table-responsive {
+    margin-top: 20px;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    background-color: #fff;
+}
+
+.table thead {
+    background-color: #32b67b; /* Same green as header */
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa; /* Light hover effect */
+    transition: background-color 0.3s ease;
+}
+
+/* Search Box Styling */
+.search_search_icon__LSw6F {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.form-control {
+    padding-right: 40px;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: rgb(33, 182, 33); /* Green background */
+    padding: 10px 0;
+}
+
+.nav-item img {
+    height: 75%;
+    width: 75%;
+}
+
+.navbar .nav-item a {
+    font-size: 20px;
+    color: black;
+    text-decoration: none;
+}
+
+
+.navbar .dropdown-item {
+    color: white;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: #2b9d69;
+}
+/* Dropdown Menu Styles */
+.dropdown-toggle::after {
+    display: none; 
+}
+
+/* Action Buttons */
+.btn-outline-danger {
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-outline-primary {
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-primary:hover {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer Styling */
+footer {
+    background-color: #32b67b;
+    color: white;
+    padding: 40px 0;
+}
+
+footer h4 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+footer p {
+    font-size: 16px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .navbar .col-sm-2,
+    .navbar .col-sm-7 {
+        text-align: center;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .card-header h2 {
+        font-size: 24px;
+    }
+
+    .btn {
+        font-size: 14px;
+    }
+}

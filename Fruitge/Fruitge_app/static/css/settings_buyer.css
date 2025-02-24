@@ -1,0 +1,292 @@
+
+        /* General Styling */
+        h2, h3 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dropdown-toggle::after {
+            display: none;
+          }
+          #wishlist2, #profile {
+            z-index: 1001; /* Ensure popup is above overlay */
+          }
+          
+          #overlay2, #overlay_p {
+            z-index: 1000; /* Overlay below popup */
+          }
+          html, body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+          }
+          .container-fluid {
+            padding: 5;}
+             /* Offcanvas Panel Styling */
+        .offcanvas-start {
+          background-color: #f9f9f9; /* Light background */
+          border-radius: 12px 0 0 12px; /* Rounded left corners */
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+          padding: 20px;
+          max-width: 400px;
+        }
+        
+        /* Offcanvas Header */
+        .offcanvas-header {
+          border-bottom: 1px solid #e0e0e0; /* Subtle border for separation */
+          margin-bottom: 15px;
+        }
+        
+        .offcanvas-title {
+          font-size: 1.6rem;
+          font-weight: bold;
+          color: #333; /* Dark gray */
+        }
+        
+        /* Form Elements */
+        label {
+          font-weight: 500;
+          color: #555; /* Medium gray */
+          margin-bottom: 8px;
+          display: inline-block;
+        }
+        
+        .form-control,
+        .form-select {
+          border-radius: 8px; /* Rounded inputs */
+          border: 1px solid #ced4da;
+          padding: 10px;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          font-size: 1rem;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+          border-color: #80bdff; /* Blue border on focus */
+          box-shadow: 0 0 5px rgba(128, 189, 255, 0.5); /* Blue glow */
+        }
+        
+        /* Submit Button */
+        .btn-primary {
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 1.1rem;
+          padding: 10px;
+          transition: background-color 0.3s ease, transform 0.2s ease;
+          border: none;
+        }
+        
+        .btn-primary:hover {
+          transform: translateY(-2px); /* Slight hover lift */
+        }
+        
+        /* Navbar Toggler */
+        .navbar-toggler {
+          border: none;
+          padding: 8px 12px;
+          border-radius: 6px;
+          transition: background-color 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+          background-color: #00b318;
+        }
+        .navbar-toggler-icon {
+          display: inline-block;
+          width: 1.5em;
+          height: 1.5em;
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3e%3c/svg%3e");
+        }
+        
+        
+        /* Spacing for form elements */
+        .mt-3 {
+          margin-top: 1rem !important;
+        }
+        
+        .mt-4 {
+          margin-top: 1.5rem !important;
+        }
+        
+        /* Overall Styling */
+        .offcanvas-body {
+          padding: 20px;
+          font-size: 0.9rem;
+          color: #444; /* Dark gray */
+        }
+        .bi-cart:hover {
+          color: #0078d4;
+        }
+        .dropdown-menu a:hover {
+          background-color: #f2f2f2;
+          color: #0078d4;
+        }
+        .dropdown-toggle:hover {
+          color: #0078d4; /* Brand hover */
+        }
+        
+        .dropdown-menu {
+          background-color: #ffffff; /* Clean white dropdown */
+          border: 1px solid #e0e0e0;
+          border-radius: 10px;
+          box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+          padding: 10px 0;
+        }
+        
+        .dropdown-menu a {
+          color: #333333;
+          font-size: 14px;
+          padding: 8px 20px;
+          font-weight: 500;
+          display: block;
+          transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .search-container input:focus {
+          border-color: #0078d4; /* Brand color focus */
+          outline: none;}
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+          .navbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+          }
+        
+          .search-container {
+            width: 100%;
+          }
+        }
+        
+        /* Review List */
+        .review-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .review-item {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .review-item:hover {
+            transform: translateY(-4px);
+        }
+        
+        /* Review Header */
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .review-rating {
+            color: #ff9800;
+        }
+        
+        /* Review Body */
+        .review-body {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Review Footer */
+        .review-footer {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: right;
+        }
+        
+        /* No Reviews */
+        .no-reviews {
+            color: #777;
+            font-style: italic;
+        }
+        
+        /* Customer Reviews Section */
+        .customer-reviews {
+            margin-top: 2rem;
+        }
+        
+        .customer-reviews h3 {
+            font-size: 1.6rem;
+            color: #444;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+                /* General Card Styling */
+                .profile-card {
+                    background-color: #fdfdfd;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    padding: 20px;
+                    width: 80%;
+                    max-width: 800px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    font-family: 'Arial', sans-serif;
+                }
+        
+                /* Profile Header */
+                .profile-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 15px;
+                }
+        
+                .profile-header h3 {
+                    margin: 0;
+                    font-size: 1.4rem;
+                    color: #007bff;
+                    font-weight: bold;
+                }
+        
+                .edit-icon {
+                    cursor: pointer;
+                    font-size: 1.4rem;
+                    color: #007bff;
+                    transition: color 0.3s;
+                }
+        
+                .edit-icon:hover {
+                    color: #0056b3;
+                }
+        
+                /* Profile Details */
+                .profile-details p {
+                    margin: 8px 0;
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    color: #333;
+                }
+        
+                .profile-details strong {
+                    display: inline-block;
+                    width: 100px;
+                    color: #000;
+                    font-weight: bold;
+                }
+        
+                .profile-details span {
+                    display: inline-block;
+                    word-wrap: break-word;
+                    vertical-align: top;
+                }
+        

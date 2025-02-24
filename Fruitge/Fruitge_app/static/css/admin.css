@@ -1,0 +1,277 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.btn-group-vertical .btn {
+    margin-bottom: 10px;
+}
+.account-details {
+    display: none; /* Ensure sections are hidden by default */
+    margin-top: 20px;
+}
+.navbar-brand img {
+    height: 100px;
+    width: auto;
+}
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Space between the top and bottom sections */
+    height: 100vh; /* Full height of the viewport */
+}
+
+.btn-group-vertical.bottom-buttons {
+        margin-top: auto; /* Push this section to the bottom */
+}
+
+#dashboard {
+    display: block; /* Ensure the Dashboard is visible by default */
+}
+#customer-reviews {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-settings-container {
+    max-width: 500px;
+    margin: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-group-text {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border: none;
+}
+
+.input-group-text:hover {
+    background-color: #e9ecef;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #003580);
+}
+
+/* Message styling */
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+body {
+    font-family: Arial, sans-serif;
+}
+
+.table, th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #2c3e50;
+    color: white;
+}
+
+th {
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.badge-cancelled {
+    background-color: #7f8c8d;
+    color: #fff;
+}
+.badge-pending {
+    background-color: #f39c12;
+    color: #fff;
+}
+.badge-picked-up {
+    background-color: #2980b9;
+    color: #fff;
+}
+.badge-delivered {
+    background-color: #27ae60;
+    color: #fff;
+}
+.badge-issue {
+    background-color: #e74c3c;
+    color: #fff;
+}
+.badge-default {
+    background-color: #bdc3c7;
+    color: #fff;
+}
+
+/* Message Styling */
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+/* Tables */
+#orders-table, .review-table, .admin-settings-container {
+    margin-top: 30px;
+}
+
+#orders-table th, .review-table th, .admin-settings-container th {
+    background-color: #2c3e50;
+    color: #fff;
+    font-weight: bold;
+}
+
+#orders-table, .review-table, .admin-settings-container {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* For Item Reviews */
+.item-reviews {
+    margin-bottom: 30px;
+}
+
+.item-title {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Review Table Styling */
+.review-table {
+    table-layout: auto;
+}
+
+.review-table th, .review-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.review-item td.review-rating {
+    color: #ff9800; /* Golden color for rating */
+}
+
+.review-item td.review-text {
+    font-size: 14px;
+    color: #666;
+    max-width: 300px;
+    word-wrap: break-word;
+}
+
+.review-item td.review-date {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Admin Settings */
+.admin-settings-container {
+    max-width: 500px;
+    margin: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-group-text {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border: none;
+}
+
+.input-group-text:hover {
+    background-color: #e9ecef;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #003580);
+}
+
+.btn-outline-success {
+    border-color: #27ae60;
+    color: #27ae60;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.btn-outline-success:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-outline-primary {
+    border-color: #2980b9;
+    color: #2980b9;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2980b9;
+    color: white;
+}
+
+/* Custom Styling for No Data Message */
+.no-data {
+    text-align: center;
+    color: #95a5a6;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.text-muted {
+    color: #95a5a6;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.fw-bold {
+    font-weight: bold;
+}
+

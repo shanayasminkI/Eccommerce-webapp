@@ -1,0 +1,139 @@
+#form_add {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1050; /* Make sure it appears above other elements */
+  width: 60%; /* Adjust as needed */
+  max-height: 80%; /* Limit the height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border-radius: 8px;
+}
+
+#overlay1 {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040; /* Slightly lower than the form */
+}
+
+#overlay1.show, #form_add.show {
+  display: block;
+}
+   
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  margin-top: 90px;
+  width: 20%;
+  border-radius: 5px;
+}
+.delete-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px; /* Adjust size as needed */
+  color: red; /* Change color if desired */
+  cursor: pointer;
+}
+
+.delete-icon:hover {
+  color: darkred; /* Optional hover effect */
+}
+
+.image-preview {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.image-preview .close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  transform: translate(50%, -50%);
+}
+
+@media (max-width: 768px) {
+  #form_add {
+    width: 90%; /* Decrease width to 90% on smaller screens */
+    height: 70vh; /* Adjust height for smaller screens */
+  }
+}
+.bg-dark {
+  background-color: #212529 !important;
+}
+
+.nav-pills .nav-item .btn {
+  border: none;
+  transition: all 0.3s ease-in-out;
+  color: #f8f9fa;
+}
+
+.nav-pills .nav-item .btn:hover {
+  background-color: #272b2e;
+  color: #fff;
+}
+
+.nav-pills .nav-item .btn-dark.active {
+  background-color: #0dfd55;
+  color: #fff;
+  font-weight: bold;
+}
+
+.nav-pills .nav-item .btn-danger:hover {
+  background-color: #fd394d;
+}
+
+.min-vh-100 {
+  height: 100vh;
+}
+#click{
+  font-size: 1.2rem;
+  color: black;
+}
+header {
+  position: sticky;
+  top: 0px;
+  z-index: 1000;
+  width: 100%;
+  background-color: rgb(33, 182, 33); /* Background color */
+}
+
+  /* Disable the expired item row visually */
+  .expired-item {
+    background-color: #f8d7da; /* Light red background */
+    color: #6c757d; /* Gray text */
+  }
+
+  /* Disable the Edit button for expired items */
+  .expired-item .edit-btn {
+    pointer-events: none; /* Disable the button */
+    opacity: 0.5; /* Make the button look disabled */
+  }
+
+  /* Optionally, make the expired item's image a little dimmer */
+  .expired-item img {
+    opacity: 0.6;
+  }
+

@@ -1,0 +1,100 @@
+body{font-family: 'Arial', sans-serif;
+background-color: #f8f9fa;
+}
+.ui-w-40 {
+width: 40px !important;
+height: auto;
+}
+
+.card{
+box-shadow: 0 1px 15px 1px rgba(52,40,104,.08);    
+}
+
+.ui-product-color {
+display: inline-block;
+overflow: hidden;
+margin: .144em;
+width: .875rem;
+height: .875rem;
+border-radius: 10rem;
+-webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
+box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
+vertical-align: middle;
+}
+
+.cart-journey-wrapper {
+margin: 20px auto;
+max-width: 100%;
+}
+
+.step {
+text-align: center;
+flex: 1;
+position: relative;
+}
+
+.circle {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+background: linear-gradient(135deg, #b3c0b0, #747973);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #fff;
+font-size: 20px;
+font-weight: bold;
+margin: 0 auto 10px;
+transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.circle.active {
+transform: scale(1.2);
+background: linear-gradient(135deg, #278124, #216921);
+}
+
+.step-label {
+font-size: 12px;
+font-weight: 500;
+color: #666;
+text-transform: uppercase;
+margin-top: 5px;
+transition: color 0.3s ease;
+}
+
+.step-label.active {
+color:#278124,;
+}
+
+.connector {
+height: 3px;
+background-color: #ddd;
+position: absolute;
+top: 18px;
+left: 50%;
+right: -50%;
+z-index: -1;
+}
+
+.connector.active {
+background: linear-gradient(90deg, #278124, #206812);
+}
+
+.cart-journey-indicator {
+display: flex;
+justify-content: space-between;
+align-items: center;
+position: relative;
+}
+
+.dropdown-toggle::after {
+    display: none;
+  }
+  
+  header {
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    width: 100%;
+    background-color: rgb(33, 182, 33); /* Background color */
+  }

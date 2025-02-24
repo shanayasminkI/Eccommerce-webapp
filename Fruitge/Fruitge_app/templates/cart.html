@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuritNVege Cart</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    <link rel="stylesheet" href="FruitNveg_Store/fnvs_app/static/css/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    {% load static %}
+<link rel="stylesheet" href="{% static 'css/cart.css'%}">
+</head>
+<header>
+<div class="row text-center navbar" style="background-color: rgb(33, 182, 33);">
+    <div class="col-4 col-sm-1 nav-item">
+      <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:75%; width:75%;">
+    </div>
+    <div class="col-4 col-sm-2 text-center nav-item">
+      <a class="pulse" href="#" style="font-size: 20px;color: black;">
+        <i class="bi bi-geo-alt"></i>
+      </a>
+    </div>
+    <div class="col-4 col-sm-7 nav-item">
+      <form class="d-flex align-items-center position-relative">
+        <!-- Search Input -->
+        <input class="form-control fs-6" type="search" placeholder="Search" aria-label="Search" style="padding-right: 40px;" />
+        <span class="search_search_icon__LSw6F" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+          <img src="https://img.crofarm.com/otipyecom/assets/svg/SmallSearch.svg" alt="" >
+        </span>
+      </form>
+    </div>
+    <div class="col-4 col-sm-2 nav-item">
+      <div class="row text-center">
+        <div class="col-6">
+          <div class="dropdown">
+            <a class="btn dropdown-toggle" data-bs-toggle="dropdown" href="#" style="font-size: 25px;"><i class="bi bi-person-circle"></i></a> 
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item btn" href="{% url 'buyer_portal' %}">Home</a></li>
+              <li><a class="dropdown-item btn" href="{% url 'view_orders' %}">Orders</a></li>
+              <li><a class="dropdown-item btn" href="#">Bills And Payments</a></li>
+              <li><a class="dropdown-item btn" href="#">Rewards</a></li>
+              <li><a class="dropdown-item btn" href="{% url 'settings_buyer' id=request.session.buyer_id %}">Settings</a></li>
+              <li><a class="dropdown-item btn" href="{% url 'logout' %}">Log Out</a></li>
+            </ul>
+          </div> 
+        </div>
+        <div class="col-6 position-relative">
+            <a class="btn position-relative" href="{% url 'view_cart' buyer_id %}" style="font-size: 20px;">
+                <i class="bi bi-cart"></i>
+                {% if cart_count > 0 %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                        {{ cart_count }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                        0
+                    </span>
+                {% endif %}
+            </a>
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
+</header>
+  
+<body>
+    <div class="row">
+    <div class="cart-journey-wrapper col-9">
+        <div class="cart-journey-indicator">
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="circle active">
+                    <i class="bi bi-cart"></i>
+                </div>
+                <p class="step-label active">Bag</p>
+                <div class="connector active"></div>
+            </div>
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="circle">
+                    <i class="bi bi-credit-card"></i>
+                </div>
+                <p class="step-label">Payment</p>
+                <div class="connector"></div>
+            </div>
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="circle">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <p class="step-label">Review</p>
+            </div>
+        </div>
+
+        <div class="container my-5 clearfix">
+            <div class="card shadow-lg" style="border-radius: 20px; background-color: #f8f9fa;">
+                <div class="card-header text-white bg-gradient" style="border-radius: 20px 20px 0 0; background-color: #28a745;">
+                    <h4 class="mb-0" style="font-size:large; font-weight: 600;">Delivery Address</h4>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <!-- Existing Address Display (Initially shown) -->
+                    <div class="position-relative" id="addressDisplay">
+                        <div class="d-flex flex-column mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0 px-2 d-flex align-items-center" style="box-shadow: none;">
+                                    <i class="bi bi-geo-alt text-success  me-2" style="font-size: large;"></i>
+                                    <!-- Display the current address -->
+                                    <p style=" margin-bottom: 0;font-size: large;"><strong>Address:</strong> <span id="display-address" style="color: #495057; font-weight: 500;">{{ buyer_address }}</span></p>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Edit Button (Shows the form and hides the address display) -->
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-outline-success rounded-pill px-4 py-2" id="editButton" style="font-size: 1rem; font-weight: 500;">Edit</button>
+                    </div>
+        
+                    <!-- Address Form (Initially hidden) -->
+                    <div id="addressForm" class="mt-4" style="display:none;">
+                        <form method="POST" action="{% url 'view_cart' buyer_id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="address" class="form-label" style="font-weight: 600;">Address</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="address" 
+                                    name="address" 
+                                    placeholder="Enter your address" 
+                                    required
+                                    style="font-size: 1rem; border-radius: 8px; padding: 12px;"></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-success rounded-pill px-4 py-2" id="saveAddress" style="font-weight: 500;">Save</button>
+                                <button type="button" class="btn btn-danger rounded-pill px-4 py-2" id="cancelButton" style="font-weight: 500;">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    <!-- products on cart -->
+    <div>
+        <div class="container px-3 my-5 clearfix">
+            <!-- Shopping cart table -->
+            <div class="card shadow"style="border-radius: 15px;">
+                <div class="card-header text-white" style="border-radius: 15px 15px 0 0;background-color: #28a745;">
+                    <h2> Product List</h2>
+                </div>
+               
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered m-0">
+                            <thead>
+                                <tr>
+                                    <!-- Set columns width --> <!-- Select All Checkbox -->
+                                    <th class="text-center py-3 px-4" style="width: 40px;">
+                                        <input type="checkbox" id="select-all">
+                                    </th>
+                                    <th class="text-center py-3 px-4" style="min-width: 400px;">Product Name &amp; Details</th>
+                                    <th class="text-right py-3 px-4" style="width: 100px;">Price</th>
+                                    <th class="text-center py-3 px-4" style="width: 120px;">Available Quantity</th>
+                                    <th class="text-center py-3 px-4" style="width: 120px;">Quantity</th>
+                                    <th class="text-right py-3 px-4" style="width: 100px;">Total</th>
+                                    <th class="text-center align-middle py-3 px-0" style="width: 40px;">
+                                        <a href="#" class="shop-tooltip float-none text-light" title="Clear cart"><i class="ino ion-md-trash"></i></a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr class="cart-item" data-item-id="{{ item.id }}">
+                                    <!-- Individual Checkbox -->
+                                    <td class="text-center align-middle">
+                                        <input type="checkbox" class="select-item" data-item-id="{{ item.id }}" {% if item.quantity == 0 %}disabled{% endif %}>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="d-flex align-items-center">
+                                            <!-- Add carousel or image like wishlist item -->
+                                            <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                                <div class="carousel-inner">
+                                                    {% if item.images.exists %}
+                                                        {% for image in item.images.all %}
+                                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                                     alt="{{ item.name }}" style="height: 60px; object-fit: cover;">
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <div class="carousel-item active">
+                                                            <img src="{% static 'placeholder.jpg' %}" class="d-block w-100 mt-2 rounded"
+                                                                 alt="No Image Available" style="height: 60px; object-fit: cover;">
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Carousel Controls -->
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                                </button>
+                                            </div>
+                                            <span class="ms-3">{{ item.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle" id="item-price-{{ item.id }}"
+                                    data-bulk-num="{{ item.bulk_num }}"
+                                    data-bulk-price="{{ item.bulk_price }}"
+                                    data-offer-price="{{ item.offer_price }}"
+                                    data-price-kg="{{ item.price_kg }}">
+                                    
+                                    {% if item.selected_quantity >= item.bulk_num %}
+                                        ₹{{ item.bulk_price }}  <!-- Display bulk price if quantity meets or exceeds bulk number -->
+                                    {% elif item.offer_price %}
+                                        ₹{{ item.offer_price }}  <!-- Display offer price if available -->
+                                    {% else %}
+                                        ₹{{ item.price_kg }}  <!-- Default to regular price per kg -->
+                                    {% endif %}
+                                </td>
+                                
+
+                                    
+                                    
+                                    <td class="text-center align-middle">
+                                        {% if item.quantity == 0 %}
+                                            <span class="text-danger">Out of Stock</span>
+                                        {% else %}
+                                            {{ item.quantity }} kg
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        {% if item.quantity == 0 %}
+                                            <input type="number" min="1" max="{{ item.quantity }}" name="current_quantity" id="quantity-{{ item.id }}" value="0" class="quantity-input" disabled>
+                                        {% else %}
+                                            <input type="number" min="1" max="{{ item.quantity }}" name="current_quantity" id="quantity-{{ item.id }}" value="1" class="quantity-input">
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right align-middle" id="total-price-{{ item.id }}">
+                                        {% if item.offer_price %}
+                                            ₹{{ item.offer_price }}
+                                        {% else %}
+                                            ₹{{ item.price_kg }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <a href="{% url 'remove_item_from_cart' item.id %}" class="text-danger">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- / Shopping cart table -->
+    
+                
+                    <div class="d-flex flex-wrap justify-content-end ">
+                      <div class="d-flex">
+                        <div class="text-right mt-4">
+                          <label class="text-muted font-weight-normal m-0">Toal price</label>
+                          <div class="text-large" id="cart-total"><strong> $</strong></div>
+                        </div>
+                      
+                        <a href="" type="button" style="margin-top: 55%; margin-left: 1px;" class="btn btn-success">Clear Cart</a>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+    </div>
+
+    <div class="col mt-4 mx-4">
+        <div class="card mb-4" style="height: 750px;">
+            <div class="card-header " style="background-color: #28a745;">
+                <h5 class="mb-0">Payments</h5>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'order_now' %}" method="post" onsubmit="prepareFormSubmission()">
+                    {% csrf_token %}
+                    <input type="hidden" id="hidden-selected-items" name="selected_items">
+                    <input type="hidden" id="hidden-quantities" name="quantities">
+    
+                    <ul class="">
+                        <li class="d-flex flex-column">
+                            <strong>Selected Items:</strong>
+                            <ul id="selected-items-list" class="list-unstyled">
+                                <!-- Selected items will be listed here -->
+                            </ul>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                            Price
+                            <span id="price_buy">₹0.00</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center px-0">
+                            Shipping
+                            <span>Gratis</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center px-0">
+                            Quantity
+                            <span id="quantity_buy">0</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                            GST (18%)
+                            <span id="gst">₹0.00</span>
+                        </li>
+                        <hr>
+                        <li class="d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                            <div>
+                                <strong>Total amount</strong>
+                                <strong>
+                                    <p class="mb-0">(including VAT)</p>
+                                </strong>
+                            </div>
+                            <span id="grand-total-payments"><strong>₹0.00</strong></span>
+                        </li>
+                    </ul>
+                    <div class="row text-center align-items-center">
+                        <div class="col-4">
+                            <input type="text" class="form-control" placeholder="Enter coupon code">
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-success">Apply Coupon</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-success">Order Now</button>
+                        </div>
+                        {% if messages %}
+    <div class="alert alert-info mt-5 ">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height: auto;"></div>
+</div>
+
+</div>
+    </body>
+
+    <footer class="text-lg-start text-white" style="background-color: #42af17">
+        <div class="container p-4 pb-0">
+            <div class="row">
+                
+                <!-- Company Logo and Name -->
+                <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                    <div>
+                        <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                    </div>
+                    <div>
+                        <h2>COMPANY NAME</h2>
+                    </div>
+                </div>
+    
+                <hr class="w-100 clearfix d-md-none" />
+    
+                <!-- Company Links -->
+                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                    <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                    <p><a href="#" class="text-white">About Us</a></p>
+                    <p><a href="#" class="text-white">Careers</a></p>
+                    <p><a href="#" class="text-white">Team</a></p>
+                </div>
+    
+                <hr class="w-100 clearfix d-md-none" />
+    
+                <!-- Contact and Download Links -->
+                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                    <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                    <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                    <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                    <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+                    
+                    <p>Better Experience, Download The App</p>
+                    
+                    <!-- App Download Links -->
+                    <div class="d-flex justify-content-center">
+                        <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                        <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                    </div>
+                </div>
+    
+                <hr class="w-100 clearfix d-md-none" />
+    
+                <!-- Contact Information -->
+                <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                    <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                    <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                    <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                    <p><i class="bi bi-telephone"></i> +1122334455</p>
+                </div>
+            </div>
+    
+            <hr class="my-3">
+    
+            <!-- Copyright and Social Media Links -->
+            <div class="row d-flex align-items-center">
+                
+                <!-- Left spacing -->
+                <div class="col-md-4"></div>
+                
+                <!-- Copyright Notice -->
+                <div class="col-md-4 text-center">
+                    <div>© 2020 Copyright:</div>
+                </div>
+                
+                <!-- Social Media Icons -->
+                <div class="col-md-4 text-md-end">
+                    <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                    <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                    <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                    <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+<script>
+    document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const itemId = input.id.split('-')[1];  // Extract item ID from the input field
+        const newQuantity = parseInt(input.value, 10);  // Get the updated quantity value
+
+        // Send the updated quantity to the backend using AJAX (you can adjust the AJAX part from earlier if needed)
+        updateQuantityInBackend(itemId, newQuantity);
+        
+        // Update the price on the frontend
+        updatePriceOnFrontend(itemId, newQuantity);
+    });
+});
+function updatePriceOnFrontend(itemId, newQuantity) {
+    // Get the relevant price element for the item
+    const itemPriceElement = document.getElementById(`item-price-${itemId}`);
+    
+    // Fetch values stored in data-* attributes
+    const bulkNum = parseInt(itemPriceElement.getAttribute('data-bulk-num'));  // Bulk number
+    const bulkPrice = parseFloat(itemPriceElement.getAttribute('data-bulk-price'));  // Bulk price
+    const offerPrice = parseFloat(itemPriceElement.getAttribute('data-offer-price'));  // Offer price
+    const priceKg = parseFloat(itemPriceElement.getAttribute('data-price-kg'));  // Regular price per kg
+
+    // Default price to price_kg
+    let priceToDisplay = priceKg;
+
+    // Check conditions for bulk price and offer price
+    if (newQuantity >= bulkNum) {
+        priceToDisplay = bulkPrice;  // Show bulk price if quantity meets or exceeds bulk number
+    } else if (offerPrice) {
+        priceToDisplay = offerPrice;  // Show offer price if available
+    }
+
+    // Update the price displayed in the DOM
+    itemPriceElement.innerHTML = `₹${priceToDisplay.toFixed(2)}`;
+}
+
+function updateQuantityInBackend(itemId, newQuantity) {
+    // Send a POST request to the backend to update the quantity
+    fetch('/view-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: `item_id=${itemId}&quantity=${newQuantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Optionally, you can update the UI or show success messages here
+            alert('Quantity updated successfully');
+        } else {
+            alert('Failed to update quantity');
+        }
+    })
+    .catch(error => console.error('Error updating quantity:', error));
+}
+
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    return csrfToken;
+}
+
+  function updateQuantity(itemId, action) {
+        fetch(`/update-cart/${itemId}/${action}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`quantity-${itemId}`).textContent = data.new_quantity;
+                document.getElementById(`total-price-${itemId}`).textContent = `$${data.new_total_price.toFixed(2)}`;
+                alert(data.message); // Optionally show a success message
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+// Function to update the total price based on quantity and unit price
+function updateTotalPrice(itemId) {
+// Get the quantity input and item price for the specific item
+const quantityInput = document.getElementById(`quantity-${itemId}`);
+const itemPriceElement = document.getElementById(`item-price-${itemId}`);
+
+// Get the price from the text content of the item price element (remove '₹' and convert to number)
+const itemPrice = parseFloat(itemPriceElement.textContent.replace('₹', '').trim());
+
+// Get the quantity from the input (it should now reflect the current quantity)
+const quantity = parseInt(quantityInput.value, 10);
+
+// Calculate the total price
+const totalPrice = itemPrice * quantity;
+
+// Update the total price for the item
+const totalPriceElement = document.getElementById(`total-price-${itemId}`);
+totalPriceElement.innerText = `₹${totalPrice.toFixed(2)}`;
+}
+
+// Event listener to update total price when quantity changes
+document.querySelectorAll('.quantity-input').forEach(input => {
+input.addEventListener('input', function() {
+    // Get the item ID from the input field's ID
+    const itemId = input.id.split('-')[1]; // Assuming the ID is "quantity-{itemId}"
+    updateTotalPrice(itemId);
+});
+});
+
+// Initial update for all items when the page loads
+document.querySelectorAll('.cart-item').forEach(item => {
+const itemId = item.getAttribute('data-item-id');
+updateTotalPrice(itemId);
+});
+
+// Function to calculate the total cart value
+function calculateCartTotal() {
+let totalValue = 0;
+
+// Loop through all cart items to calculate the total
+document.querySelectorAll('.cart-item').forEach(item => {
+    const itemId = item.getAttribute('data-item-id');
+
+    // Get the offer price and quantity for each item
+    const itemPriceElement = document.getElementById(`item-price-${itemId}`);
+    const quantityInput = document.getElementById(`quantity-${itemId}`);
+
+    // Get the item price (remove '₹' and convert to number)
+    const itemPrice = parseFloat(itemPriceElement.textContent.replace('₹', '').trim());
+
+    // Get the quantity from the input
+    const quantity = parseInt(quantityInput.value, 10);
+
+    // Calculate the total price for the item and add it to the total value
+    totalValue += itemPrice * quantity;
+});
+
+// Update the total value display
+document.getElementById('cart-total').innerText = `₹${totalValue.toFixed(2)}`;
+
+// Apply the discount based on the decimal part
+applyDiscount(totalValue);
+}
+
+// Event listener to calculate total when the page loads or when quantity changes
+document.addEventListener('DOMContentLoaded', calculateCartTotal); // Initial calculation
+document.querySelectorAll('.quantity-input').forEach(input => {
+input.addEventListener('input', calculateCartTotal); // Recalculate when quantity changes
+});
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to update payment section dynamically
+    function updatePaymentsSection() {
+        let totalAmount = 0;
+        let totalQuantity = 0;
+        let selectedItems = [];
+        let quantities = [];
+
+        document.querySelectorAll(".select-item:checked").forEach(item => {
+            const itemId = item.getAttribute("data-item-id");
+            const priceElement = document.getElementById(`item-price-${itemId}`);
+            const quantityInput = document.getElementById(`quantity-${itemId}`);
+
+            if (priceElement && quantityInput) {
+                const price = parseFloat(priceElement.innerText.replace("₹", "")) || 0;
+                const quantity = parseInt(quantityInput.value) || 0;
+                
+                if (quantity > 0) {
+                    totalAmount += price * quantity;
+                    totalQuantity += quantity;
+                    selectedItems.push(itemId);
+                    quantities.push(quantity);
+                }
+            }
+        });
+
+        // Update price and quantity on UI
+        document.getElementById("price_buy").innerText = `₹${totalAmount.toFixed(2)}`;
+        document.getElementById("quantity_buy").innerText = totalQuantity;
+        
+        // Calculate GST (18%)
+        let gst = totalAmount * 0.18;
+        document.getElementById("gst").innerText = `₹${gst.toFixed(2)}`;
+
+        // Update Grand Total
+        let grandTotal = totalAmount + gst;
+        document.getElementById("grand-total-payments").innerHTML = `<strong>₹${grandTotal.toFixed(2)}</strong>`;
+
+        // Ensure hidden input fields are updated in real-time
+        document.getElementById("hidden-selected-items").value = selectedItems.join(",");
+        document.getElementById("hidden-quantities").value = quantities.join(",");
+    }
+
+    // Function to handle form submission
+    function prepareFormSubmission(event) {
+        event.preventDefault(); // Stop form submission initially
+
+        // Call updatePaymentsSection to ensure data is updated
+        updatePaymentsSection();
+
+        const selectedItems = document.getElementById("hidden-selected-items").value;
+        const quantities = document.getElementById("hidden-quantities").value;
+
+        if (!selectedItems || selectedItems.trim() === "") {
+            alert("Please select at least one item before placing the order.");
+            return;
+        }
+
+        console.log("Final Selected Items before submission:", selectedItems); // Debugging
+        console.log("Final Quantities before submission:", quantities); // Debugging
+
+        // Submit form
+        event.target.submit();
+    }
+
+    // Attach form submission event
+    document.querySelector("form").addEventListener("submit", prepareFormSubmission);
+
+    // Attach update function to quantity & checkbox changes
+    document.querySelectorAll(".quantity-input").forEach(input => {
+        input.addEventListener("input", updatePaymentsSection);
+    });
+
+    document.querySelectorAll(".select-item").forEach(checkbox => {
+        checkbox.addEventListener("change", updatePaymentsSection);
+    });
+
+    // Handle the Select All functionality
+    document.getElementById("select-all").addEventListener("change", function () {
+        const selectAllChecked = this.checked;
+        document.querySelectorAll(".select-item").forEach(checkbox => {
+            if (!checkbox.disabled) {
+                checkbox.checked = selectAllChecked;
+            }
+        });
+        updatePaymentsSection();
+    });
+
+    // Initialize on page load
+    updatePaymentsSection();
+});
+// Show the address form when the edit button is clicked
+document.getElementById('editButton').addEventListener('click', function() {
+document.getElementById('addressDisplay').style.display = 'none'; // Hide current address
+document.getElementById('addressForm').style.display = 'block'; // Show address form
+});
+
+// Cancel the address editing
+document.getElementById('cancelButton').addEventListener('click', function() {
+document.getElementById('addressDisplay').style.display = 'block'; // Show current address
+document.getElementById('addressForm').style.display = 'none'; // Hide address form
+});
+ // Initialize Bootstrap dropdowns
+ var dropdowns = document.querySelectorAll('.dropdown-toggle');
+  dropdowns.forEach(function(dropdown) {
+    new bootstrap.Dropdown(dropdown);
+  });
+
+</script>
+</html>

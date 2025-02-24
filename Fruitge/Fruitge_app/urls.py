@@ -1,0 +1,38 @@
+from django.urls import path
+from . import views
+
+urlpatterns=[
+    
+    path('',views.index_load,name='header'),
+    path('contactfun/',views.contactfun,name='contactUs_form'),
+    path('item_add/',views.item_add,name='item_add'),
+    path('admin_portal/',views.admin_portal,name='admin_portal'),
+    path('settings_buyer/<int:id>/', views.settings_buyer, name='settings_buyer'),
+    path('buyer_portal/',views.buyer_portal,name='buyer_portal'),
+    path('signUp/',views.signUp,name='signUp'),
+    path('item_save/',views.item_save, name='item_save'),
+    path('cart/<int:id>/',views.db1_cart,name='db1_cart'),
+    path('view_cart/', views.view_cart, name='view_cart'),
+    path('view_cart/<int:id>/', views.view_cart, name='view_cart'),
+    path('wishlist/<int:id>/',views.db1_wishlist,name='db1_wishlist'),
+    # path("delete-item/<int:item_id>/",views.delete_item, name="delete_item"),
+    path('order/', views.order_now, name='order_now'),
+    path('order/confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('orders/', views.view_orders, name='view_orders'),
+    path('order/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('remove_from_wishlist/<int:item_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('remove-from-cart/<int:item_id>/', views.remove_item_from_cart, name='remove_item_from_cart'),
+    path('clear_wishlist/', views.clear_wishlist, name='clear_wishlist'),
+    path('item/<int:product_id>/', views.item_details, name='item_details'),
+    path('products-on-offer/', views.products_on_offer, name='products_on_offer'),
+    path('deliveryAgent/', views.deliveryAgent, name='deliveryAgent'),
+    path('admin_login/',views.admin_login,name='admin_login'),
+    path('admin_fun/',views.admin_fun,name='admin_fun'),
+    path('logout/',views.logout,name='logout'),
+    path('approve_account/<str:account_type>/<int:account_id>/', views.approve_account, name='approve_account'),
+    path('edit_account/<str:account_type>/<int:account_id>/', views.edit_account, name='edit_account'),
+    path('delete-account/<int:account_id>/<str:account_type>/', views.delete_account, name='delete_account'),
+    path('cancel-order/<int:order_id>/', views.cancel_order, name='cancel_order'),
+    path('update_order_status/', views.update_order_status, name='update_order_status'),
+    path('delete_review/<int:review_id>/', views.delete_review, name='delete_review'),
+]

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="FruitNveg_Store/fnvs_app/static/css/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>Products on Offer</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    {% load static %}
+    <link rel="stylesheet" href="{%static 'css/offer.css'%}">
+</head>
+<style>
+
+.dropdown-toggle::after {
+    display: none;
+  }
+</style>
+<header>
+    <div class="row text-center navbar" style="background-color: rgb(33, 182, 33);">
+      <div class="col-1 nav-item">
+          <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:75%; width:75%;">
+      </div>
+      <div class="col-2 text-center nav-item">
+        
+            <a class="pulse" href="#" style="font-size: 20px;color: black;">
+                <i class="bi bi-geo-alt"></i></a>
+      </div>
+      <div class="col-7 nav-item">
+        <div>
+          <form class="d-flex align-items-center position-relative">
+            <!-- Search Input -->
+            <input
+              class="form-control fs-6"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              style="padding-right: 40px;"
+            />
+            <span class="search_search_icon__LSw6F" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);  ">
+              <img src="https://img.crofarm.com/otipyecom/assets/svg/SmallSearch.svg" alt="" >
+            </span>
+          </form>
+        </div>
+      </div>
+  
+  
+  
+      <div class="col-2 nav-item row text-center ">
+          <div class="col-6">
+            <div class="dropdown">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown" href="#" style="font-size: 25px;" ><i class="bi bi-person-circle"></i></a> 
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item btn" href="{% url 'buyer_portal' %}">Home</a></li>
+                    <li><a class="dropdown-item btn" href="{% url 'view_orders' %}">Orders</a></li>
+                    <li><a class="dropdown-item btn" href="#">Bills And Payments</a></li>
+                    <li><a class="dropdown-item btn" href="#">Rewards</a></li>
+                    <li><a class="dropdown-item btn" href="{% url 'settings_buyer' id=request.session.buyer_id %}">Settings</a></li>
+  
+                    <li><a class="dropdown-item btn" href="{% url 'logout' %}">Log Out</a></li>
+  
+  
+                  </ul>
+              </div> 
+          </div>
+          <div class="col-6" >
+            <a class="btn position-relative" href="{% url 'view_cart' buyer_id %}" style="font-size: 20px;">
+                <i class="bi bi-cart"></i>
+                {% if cart_count > 0 %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                        {{ cart_count }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                        0
+                    </span>
+                {% endif %}
+            </a>
+  
+          </div>
+      </div>
+    </div>
+  </header>
+<body>
+    
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 mb-3">
+        {% for product in products %}
+            {% if not product.is_expired %}
+                <div class="col d-flex justify-content-center">
+                    <a href="{% url 'item_details' product.id %}" class="text-decoration-none">
+                        <div class="card position-relative">
+                            {% if product.offfer %}
+                                <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    {{ product.offfer }}% Off
+                                </span>
+                            {% elif product.quantity == 0 %}
+                                <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    Out of Stock
+                                </span>
+                            {% endif %}
+    
+                            <!-- Product Image -->
+                            <div id="carousel{{ product.id }}" class="carousel slide img-container rounded-5" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    {% for image in product.images.all %}
+                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                            <img src="{{ image.image.url }}" class="d-block w-100 rounded-top product-img" alt="{{ product.name }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            </div>
+    
+                            <!-- Card Body -->
+                            <div class="card-body text-center p-2">
+                                <!-- Product Name -->
+                                <p class="card-title fw-bold text-muted mb-1" style="font-size: 20px;">{{ product.name }}</p>
+                            </div>
+    
+                            <!-- Price and Actions Section -->
+                            <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3" style="background: transparent;">
+                                <!-- Price Section -->
+                                <div>
+                                    {% if product.offer_price %}
+                                        <p>
+                                            <span class="text-success">₹{{ product.offer_price }}</span>
+                                            <span class="text-muted text-decoration-line-through">₹{{ product.price_kg }}</span>
+                                        </p>
+                                    {% else %}
+                                        <p class="text-dark fw-bold fs-5">₹{{ product.price_kg }}</p>
+                                    {% endif %}
+                                </div>
+    
+                                <!-- Wishlist and Add-to-Cart Section -->
+                                <div class="d-flex gap-2 align-items-center">
+                                    <!-- Wishlist Icon -->
+                                    <a class="btn btn-link p-0 me-2 wishlist-icon" href="{% url 'db1_wishlist' product.id %}">
+                                        <i class="bi {% if product.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                           style="font-size: 20px; color: {% if product.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                    </a>
+                                    <!-- Add to Cart Button -->
+                                    {% if product.quantity > 0 %}
+                                        <a href="#" class="btn btn-success btn-sm">ADD</a>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Unavailable</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+    
+                            <div class="rating mb-4">
+                                {% for i in "12345" %}
+                                    <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                {% endfor %}
+                                <span class="average-rating">({{ product.average_rating }})</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p class="text-center text-muted">No products available.</p>
+        {% endfor %}
+    </div>
+    
+</body>
+<footer class="text-lg-start text-white fixed-bottom" style="background-color: #42af17">
+    <div class="container p-4 pb-0">
+        <div class="row">
+            
+            <!-- Company Logo and Name -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <div>
+                    <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                </div>
+                <div>
+                    <h2>COMPANY NAME</h2>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Company Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                <p><a href="#" class="text-white">About Us</a></p>
+                <p><a href="#" class="text-white">Careers</a></p>
+                <p><a href="#" class="text-white">Team</a></p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact and Download Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+                
+                <p>Better Experience, Download The App</p>
+                
+                <!-- App Download Links -->
+                <div class="d-flex justify-content-center">
+                    <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                    <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact Information -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                <p><i class="bi bi-telephone"></i> +1122334455</p>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <!-- Copyright and Social Media Links -->
+        <div class="row d-flex align-items-center">
+            
+            <!-- Left spacing -->
+            <div class="col-md-4"></div>
+            
+            <!-- Copyright Notice -->
+            <div class="col-md-4 text-center">
+                <div>© 2020 Copyright:</div>
+            </div>
+            
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-md-end">
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

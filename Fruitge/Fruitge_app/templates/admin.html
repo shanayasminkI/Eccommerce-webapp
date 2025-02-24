@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuritNVege Admin </title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin.css'%}">
+
+    <script type="text/javascript">
+    // Prevent back button by manipulating history
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.history.pushState(null, null, window.location.href);
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the last active section from sessionStorage
+    const activeSection = sessionStorage.getItem("activeSection") || "dashboard"; // Default to "dashboard"
+
+    // Hide all sections
+    document.querySelectorAll(".account-details").forEach(div => div.style.display = "none");
+
+    // Show the active section
+    const selectedDiv = document.getElementById(activeSection);
+    if (selectedDiv) {
+        selectedDiv.style.display = "block";
+    }
+});
+
+function toggle_div(divId) {
+    // Hide all sections
+    document.querySelectorAll(".account-details").forEach(div => div.style.display = "none");
+
+    // Show the selected section
+    const selectedDiv = document.getElementById(divId);
+    if (selectedDiv) {
+        selectedDiv.style.display = "block";
+        // Save the active section in sessionStorage
+        sessionStorage.setItem("activeSection", divId);
+    }
+}
+ </script>   
+
+</head>
+<body>
+    {% load static %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-2 text-white sidebar"style=" background-color: #343a40;">
+                <nav class="navbar navbar-expand-sm  navbar-dark sticky-top" style=" background-color: #343a40;">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="#">
+                            <img src="{% static 'Logo/logo1.png' %}" alt="Logo">
+                        </a>
+                    </div>
+                </nav>
+                <div class="btn-group-vertical w-100 mt-3">
+                    <button type="button" onclick="toggle_div('dashboard')" class="btn btn-primary">Dashboard</button>
+                    <button type="button" onclick="toggle_div('seller-details')" class="btn btn-primary">Seller Account</button>
+                    <button type="button" onclick="toggle_div('buyer-details')" class="btn btn-primary">Buyer Account</button>
+                    <button type="button" onclick="toggle_div('da-details')" class="btn btn-primary">DA Account</button>
+                    <button type="button" onclick="toggle_div('orders')" class="btn btn-primary">Orders</button>
+                </div>
+            
+                <!-- Bottom buttons -->
+                <div class="btn-group-vertical w-100 bottom-buttons">
+                    <button type="button" onclick="toggle_div('settings')" class="btn btn-primary">Settings</button>
+                    <button type="button" class="btn btn-primary">Payments/Billings</button>
+                    <button type="button" onclick="toggle_div('reviews')" class="btn btn-primary">Reviews</button>
+                    <button type="button" onclick="toggle_div('complaints')" class="btn btn-primary">Complaints</button>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Sign Out</a>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-sm-10">
+                <div id="dashboard" class="account-details">
+                    <div class="container">
+                        <h3 class="text-center fw-bold text-uppercase mb-4">Admin Dashboard</h3>
+                        
+                        <div class="row d-flex justify-content-center">
+                            <!-- Total Users -->
+                            <div class="col-md-3">
+                                <div class="card border-0 shadow-sm rounded-4 bg-light text-center">
+                                    <div class="card-body">
+                                        <h5 class="text-muted">Total Users</h5>
+                                        <p class="display-5 fw-bold text-primary">{{ total_users }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <!-- Pending Orders -->
+                            <div class="col-md-3">
+                                <div class="card border-0 shadow-sm rounded-4 bg-light text-center">
+                                    <div class="card-body">
+                                        <h5 class="text-muted">Pending Orders</h5>
+                                        <p class="display-5 fw-bold text-warning">{{ pending_orders_count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Recent Activity -->
+                        <div class="mt-5">
+                            <h3 class="fw-bold text-uppercase">Recent Activity</h3>
+                    
+                            <!-- Time Range Filter Dropdown -->
+                            <form method="GET" action="" class="mb-3">
+                                <label for="time_range" class="fw-semibold me-2">Filter by:</label>
+                                <select name="time_range" id="time_range" class="form-select w-auto d-inline rounded-pill shadow-sm" onchange="this.form.submit()">
+                                    <option value="all" {% if request.GET.time_range == "all" %}selected{% endif %}>Recent 5 Entries</option>
+                                    <option value="24h" {% if request.GET.time_range == "24h" %}selected{% endif %}>Last 24 Hours</option>
+                                    <option value="7d" {% if request.GET.time_range == "7d" %}selected{% endif %}>Last 7 Days</option>
+                                </select>
+                            </form>
+                    
+                            <!-- Recent Activity List -->
+                            <div class="list-group shadow-sm rounded-4">
+                                {% for activity in recent_activities %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong class="text-primary">{{ activity.get_activity_type_display }}</strong> <br>
+                                            <span class="text-muted">{{ activity.description }}</span>
+                                        </div>
+                                        <small class="badge bg-secondary">{{ activity.timestamp }}</small>
+                                    </div>
+                                {% empty %}
+                                    <div class="list-group-item text-muted text-center">No recent activity.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                        <!-- Notifications -->
+                        <div class="mt-5">
+                            <h3 class="fw-bold text-uppercase">Notifications</h3>
+                            
+                            <div class="alert alert-light border-start border-warning border-4 shadow-sm rounded-4 d-flex align-items-center">
+                                <i class="bi bi-person-badge-fill me-2 text-warning"></i>
+                                {% if pending_sellers %}
+                                    <span><strong>{{ pending_sellers }}</strong> seller accounts pending approval.</span>
+                                {% else %}
+                                    <span class="text-muted">No pending seller accounts.</span>
+                                {% endif %}
+                            </div>
+                    
+                            <div class="alert alert-light border-start border-danger border-4 shadow-sm rounded-4 d-flex align-items-center">
+                                <i class="bi bi-truck me-2 text-danger"></i>
+                                {% if pending_das %}
+                                    <span><strong>{{ pending_das }}</strong> delivery agent accounts pending approval.</span>
+                                {% else %}
+                                    <span class="text-muted">No pending delivery agent accounts.</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                
+                <!-- Seller Accounts -->
+                <div id="seller-details" class="account-details">
+                    <div class="container mt-5">
+                        <h1 class="text-center fw-bold text-uppercase">Seller Accounts</h1>
+                    
+                        <div class="table-responsive shadow-sm rounded-4 overflow-hidden mt-4">
+                            <table class="table table-hover align-middle text-center">
+                                <thead class="table-dark sticky-top">
+                                    <tr>
+                                        <th>Seller ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Address</th>
+                                        <th>GST</th>
+                                        <th>Shop Name</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                        <th>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-light">
+                                    {% for account in seller_accounts %}
+                                        <tr class="border-bottom">
+                                            <td class="fw-bold">{{ account.id }}</td>
+                                            <td>{{ account.name }}</td>
+                                            <td>{{ account.email }}</td>
+                                            <td>{{ account.mobileNo }}</td>
+                                            <td>{{ account.address }}</td>
+                                            <td>{{ account.gst_no }}</td>
+                                            <td>{{ account.shop_name }}</td>
+                                            <td>
+                                                {% if account.is_approved %}
+                                                    <span class="badge bg-success">Approved</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if not account.is_approved %}
+                                                    <a href="{% url 'approve_account' 'seller' account.id %}" class="btn btn-outline-success btn-sm">
+                                                        <i class="bi bi-check-circle"></i> Approve
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'edit_account' 'seller' account.id %}" class="btn btn-outline-warning btn-sm">
+                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="10" class="text-center text-muted py-3">No seller accounts available</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+                   
+                <!-- Buyer Details -->
+                <div id="buyer-details" class="account-details">
+                    <div class="container mt-5">
+                        <h1 class="text-center fw-bold text-uppercase">Buyer Accounts</h1>
+                    
+                        <div class="table-responsive shadow-sm rounded-4 overflow-hidden mt-4">
+                            <table class="table table-hover align-middle text-center">
+                                <thead class="table-dark sticky-top">
+                                    <tr>
+                                        <th>Buyer ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Address</th>
+                                        <th>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-light">
+                                    {% if buyer_accounts %}
+                                        {% for account in buyer_accounts %}
+                                            <tr class="border-bottom">
+                                                <td class="fw-bold">{{ account.id }}</td>
+                                                <td>{{ account.name }}</td>
+                                                <td>{{ account.email }}</td>
+                                                <td>{{ account.mobileNo }}</td>
+                                                <td>{{ account.address }}</td>
+                                                <td>
+                                                    <a href="{% url 'edit_account' 'buyer' account.id %}" class="btn btn-outline-warning btn-sm">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-3">No buyer accounts available</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div id="settings" class="account-details">
+                    <div class="admin-settings-container shadow p-4 rounded bg-white mt-5">
+                        <h3 class="text-center fw-bold text-uppercase mb-4">Change Admin Password</h3>
+                
+                        <form id="passwordChangeForm" method="post" class="needs-validation">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3 position-relative">
+                                <label for="current_password" class="form-label fw-semibold">Current Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="current_password" name="current_password" class="form-control" required>
+                                    <span class="input-group-text toggle-password" onclick="togglePassword('current_password')">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                
+                            <div class="mb-3 position-relative">
+                                <label for="new_password" class="form-label fw-semibold">New Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="new_password" name="new_password" class="form-control" required>
+                                    <span class="input-group-text toggle-password" onclick="togglePassword('new_password')">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                
+                            <div class="mb-3 position-relative">
+                                <label for="confirm_password" class="form-label fw-semibold">Confirm Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                                    <span class="input-group-text toggle-password" onclick="togglePassword('confirm_password')">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary fw-bold">Change Password</button>
+                            </div>
+                        </form>
+                
+                        <!-- Display success or error messages -->
+                        <div id="formMessage" class="form-message text-center mt-3"></div>
+                
+                        {% if messages %}
+                            <div class="message-container mt-3">
+                                {% for message in messages %}
+                                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} text-center">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+
+                <!-- DA Details -->
+                <div id="da-details" class="account-details">
+                    <div class="container mt-4">
+                        <h1 class="text-center fw-bold text-uppercase">Delivery Agent Accounts</h1>
+                    
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-dark text-center">
+                                    <tr>
+                                        <th>DA Id</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Address</th>
+                                        <th>DOB</th>
+                                        <th>Driving Licence No</th>
+                                        <th>Vehicle No</th>
+                                        <th>Preferred Location</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                        <th>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if da_accounts %}
+                                        {% for account in da_accounts %}
+                                            <tr class="text-center">
+                                                <td>{{ account.id }}</td>
+                                                <td>{{ account.name }}</td>
+                                                <td>{{ account.email }}</td>
+                                                <td>{{ account.mobileNo }}</td>
+                                                <td>{{ account.address }}</td>
+                                                <td>{{ account.dob }}</td>
+                                                <td>{{ account.driving_license_no }}</td>
+                                                <td>{{ account.vehicle_no }}</td>
+                                                <td>{{ account.preferred_location }}</td>
+                                                <td>
+                                                    <span class="badge {% if account.is_approved %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                                        {% if account.is_approved %} Approved {% else %} Pending {% endif %}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% if not account.is_approved %}
+                                                        <a href="{% url 'approve_account' 'da' account.id %}" class="btn btn-outline-success btn-sm">Approve</a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'edit_account' 'da' account.id %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="12" class="text-center text-muted">No delivery agent accounts available</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <section id="orders" class="account-details">
+                    <div class="container mt-4">
+                    <h1 class="text-center fw-bold text-uppercase">All Orders</h1>
+                    <table id="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Buyer Name</th>
+                                <th>Buyer Address</th>
+                                <th>Seller Name</th>
+                                <th>Agent</th>
+                                <th>Status</th>
+                                <th>Grand Total</th>
+                                <th>Order Created At</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grouped_order in grouped_orders %}
+                                {% with order_id=grouped_order.order_id order_data=grouped_order.order_data %}
+                                    {% for enriched_order in order_data.order_items %}
+                                        <tr data-order-id="{{ order_id }}">
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ order_id }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.buyer_name }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.buyer_address }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.seller_name }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.agent_name }}</td>
+                                                
+                                                <td rowspan="{{ order_data.order_items|length }}">
+                                                    <span class="badge 
+                                                        {% if enriched_order.is_cancelled %}
+                                                            badge-cancelled
+                                                        {% elif enriched_order.order_item.status == 'pending' %}
+                                                            badge-pending
+                                                        {% elif enriched_order.order_item.status == 'picked_up' %}
+                                                            badge-picked-up
+                                                        {% elif enriched_order.order_item.status == 'delivered' %}
+                                                            badge-delivered
+                                                        {% elif enriched_order.order_item.status == 'issue' %}
+                                                            badge-issue
+                                                        {% else %}
+                                                            badge-default
+                                                        {% endif %}
+                                                    ">
+                                                        {% if enriched_order.is_cancelled %}
+                                                            Cancelled
+                                                        {% else %}
+                                                            {{ enriched_order.order_item.status }}
+                                                        {% endif %}
+                                                    </span>
+                                                </td>
+                                                
+                                                <td rowspan="{{ order_data.order_items|length }}">₹{{ order_data.grand_total|floatformat:2 }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.order_created_at }}</td>
+                                            {% endif %}
+                                            <td>{{ enriched_order.order_item.item.name }}</td>
+                                            <td>{{ enriched_order.order_item.quantity }} Kg</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </section>
+                
+             
+                <div id="reviews" class="account-details">
+                    <div id="customer-reviews">
+                        <h3 class="reviews-title">Customer Reviews for Items</h3>
+                        {% for item in items %}
+                            {% if item.ratingreview_set.all %}
+                            <div class="item-reviews">
+                                <h4 class="item-title">{{ item.name }}</h4>
+                                <table class="review-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Reviewer</th>
+                                            <th>Rating</th>
+                                            <th>Review</th>
+                                            <th>Reviewed On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for review in item.ratingreview_set.all %}
+                                        <tr class="review-item">
+                                            <td class="reviewer-name">{{ review.buyer.name }}</td>
+                                            <td class="review-rating">{{ review.rating }} stars</td>
+                                            <td class="review-text">{{ review.review }}</td>
+                                            <td class="review-date">{{ review.created_at|date:"F j, Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+
+                <div id="complaints" class="account-details">
+                    <h3 class="mt-4 text-center">Complaints</h3>
+                    <table class="table table-striped table-bordered mt-3">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Mobile Number</th>
+                                <th>Complaint Type</th>
+                                <th>Message</th>
+                                <th>Created At</th>
+                                <th>Action</th> <!-- Added column for action button -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ complaint.name }}</td>
+                                <td>{{ complaint.email }}</td>
+                                <td>{{ complaint.mobile_number }}</td>
+                                <td>{{ complaint.get_complaint_type_display }}</td>
+                                <td>{{ complaint.message }}</td>
+                                <td>{{ complaint.created_at }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" onclick="">Respond</button> <!-- Response button -->
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center">No complaints found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>  
+    
+        </div>
+    </div>
+    </div>
+</body>
+</html>

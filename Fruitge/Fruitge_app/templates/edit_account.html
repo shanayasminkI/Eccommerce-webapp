@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Account</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h3>Edit {{ account_type|title }} Account</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ account.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ account.email }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="mobileNo" class="form-label">Mobile Number</label>
+                <input type="text" id="mobileNo" name="mobileNo" class="form-control" value="{{ account.mobileNo }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text"  class="form-control" id="address"  name="address" value="{{ account.address }}">                
+            </div>
+            {% if account_type == 'seller' %}
+            <div class="mb-3">
+                <label for="gst_number" class="form-label">GST Number</label>
+                <input type="text" id="gst_number" name="gst_no" class="form-control" value="{{ account.gst_no }}">
+            </div>
+            <div class="mb-3">
+                <label for="shop_name" class="form-label">Shop Name</label>
+                <input type="text" id="shop_name" name="shop_name" class="form-control" value="{{ account.shop_name }}">
+            </div>
+            {% endif %}
+
+            {% if account_type == 'da'%}
+            <div class="mb-3">
+                <label for="dob">Date of Birth</label>
+                <input type="date" class="form-control" name="dob" value="{{ account.dob }}">
+            </div>
+            <div class=" mb-3">
+                <label for="driving_license_no">Driving License No</label>
+                <input type="text" class="form-control" name="driving_license_no" value="{{ account.driving_license_no }}">
+                
+            </div>
+            <div class="mb-3">
+                <label for="vehicle_no">Vehicle No</label>
+                <input type="text" class="form-control" name="vehicle_no" value="{{ account.vehicle_no}}">
+                
+            </div>
+            <div class="mb-3">                
+                <label for="preferred_location">Preferred Location</label>
+                <input type="text" class="form-control" name="preferred_location" value="{{ account.preferred_location}}">
+            </div>
+        
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'admin_portal' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+        
+        <hr class="my-4">
+        <form method="POST" action="{% url 'delete_account' account.id account_type %}" class="mt-4" onsubmit="return confirm('Are you sure you want to delete this account?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete Account</button>
+        </form>
+        
+        
+    </div>
+</body>
+</html>

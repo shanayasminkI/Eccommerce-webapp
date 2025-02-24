@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    
+    <link rel="stylesheet" href="FruitNveg_Store/fnvs_app/static/css/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/order_confirmation.css' %}">
+</head>
+<header>
+    <div class="row text-center navbar" style="background-color: rgb(33, 182, 33);">
+        <div class="col-4 col-sm-1 nav-item">
+          <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:75%; width:75%;">
+        </div>
+        <div class="col-4 col-sm-2 text-center nav-item">
+          <a class="pulse" href="#" style="font-size: 20px;color: black;">
+            <i class="bi bi-geo-alt"></i>
+          </a>
+        </div>
+        <div class="col-4 col-sm-7 nav-item">
+          <form class="d-flex align-items-center position-relative">
+            <!-- Search Input -->
+            <input class="form-control fs-6" type="search" placeholder="Search" aria-label="Search" style="padding-right: 40px;" />
+            <span class="search_search_icon__LSw6F" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+              <img src="https://img.crofarm.com/otipyecom/assets/svg/SmallSearch.svg" alt="" >
+            </span>
+          </form>
+        </div>
+        <div class="col-4 col-sm-2 nav-item">
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="dropdown">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown" href="#" style="font-size: 25px;"><i class="bi bi-person-circle"></i></a> 
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item btn" href="{% url 'buyer_portal' %}">Home</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'view_orders' %}">Orders</a></li>
+                  <li><a class="dropdown-item btn" href="#">Bills And Payments</a></li>
+                  <li><a class="dropdown-item btn" href="#">Rewards</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'settings_buyer' id=request.session.buyer_id %}">Settings</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'logout' %}">Log Out</a></li>
+                </ul>
+              </div> 
+            </div>
+            <div class="col-6 position-relative">
+                <a class="btn position-relative" href="{% url 'view_cart' buyer_id %}" style="font-size: 20px;">
+                    <i class="bi bi-cart"></i>
+                    {% if cart_count > 0 %}
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                            {{ cart_count }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                            0
+                        </span>
+                    {% endif %}
+                </a>
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+    </header>
+<body>
+    <div class="cart-journey-indicator mt-5">
+        <!-- Step 1 -->
+        <div class="step">
+            <div class="circle active">
+                <i class="bi bi-cart"></i>
+            </div>
+            <p class="step-label active">Bag</p>
+            <div class="connector active"></div>
+        </div>
+        <!-- Step 3 -->
+        <div class="step">
+            <div class="circle active">
+                <i class="bi bi-credit-card active"></i>
+            </div>
+            <p class="step-label">Payment</p>
+            <div class="connector active"></div>
+        </div>
+        <!-- Step 4 -->
+        <div class="step">
+            <div class="circle active">
+                <i class="bi bi-check2-circle active"></i>
+            </div>
+            <p class="step-label">Review</p>
+        </div>
+    </div>
+
+<div class="container" id="container">
+    <h1>Order Confirmation</h1>
+    <h2>Order Details</h2>
+
+    <div class="order-summary">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        {% for item in order_items %}
+            <p><strong>Order Item:</strong> {{ item.item.name }}</p>
+        {% endfor %}
+        <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+        <p><strong>GST (18%):</strong> ₹{{ order.gst_amount }}</p>
+        <p><strong>Grand Total:</strong> ₹{{ order.grand_total }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+    </div>
+
+    {% if completed_orders_exist %}
+        <div id="rating-review-section">
+            <h3 class="text-center">Rate and Review Your Order</h3>
+            <form method="POST" action="{% url 'order_confirmation' order.id %}">
+                {% csrf_token %}
+                
+                <label for="rating">Rating:</label>
+                <div class="star-rating">
+                    {% for i in "12345" %}
+                        <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" hidden {% if existing_rating == i|add:0 %}checked{% endif %}>
+                        <label for="star{{ i }}" class="fa fa-star" data-star="{{ i }}"></label>
+                    {% endfor %}
+                </div>
+
+                <label for="review">Review:</label>
+                <textarea name="review" id="review" rows="4" placeholder="Write your review here...">{% if existing_review %}{{ existing_review|escape }}{% endif %}</textarea>
+
+                <button type="submit">{% if existing_review %}Update{% else %}Submit{% endif %}</button>
+            </form>
+        </div>
+    {% else %}
+        <p class="text-center text-muted">You can only rate orders that have been delivered.</p>
+    {% endif %}
+
+    {% if messages %}
+        <div class="alert alert-success">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- "View All Orders" Button -->
+    <a href="{% url 'view_orders' %}" class="view-orders-btn">View All Orders</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const stars = document.querySelectorAll('.star-rating .fa-star');
+    
+    // Star hover effect
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', function () {
+            let starValue = parseInt(this.getAttribute('data-star'));
+            for (let i = 0; i < starValue; i++) {
+                stars[i].style.color = "#ffcc00";
+            }
+        });
+
+        star.addEventListener('mouseleave', function () {
+            stars.forEach(s => {
+                if (!s.classList.contains('active')) {
+                    s.style.color = "#ddd";
+                }
+            });
+        });
+    });
+
+    // Star click effect (Rating Selection)
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            let selectedValue = parseInt(this.getAttribute('data-star'));
+            
+            // Reset all stars
+            stars.forEach(s => {
+                s.classList.remove('active');
+                s.style.color = "#ddd";
+            });
+
+            // Activate selected stars
+            for (let i = 0; i < selectedValue; i++) {
+                stars[i].classList.add('active');
+                stars[i].style.color = "#ffc107";
+            }
+
+            // Set hidden input
+            document.getElementById(`star${selectedValue}`).checked = true;
+        });
+    });
+});
+</script>
+
+</body>
+
+<!-- Footer Section -->
+<footer class="text-lg-start text-white" style="background-color: #42af17">
+    <div class="container p-4 pb-0">
+        <div class="row">
+            
+            <!-- Company Logo and Name -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <div>
+                    <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                </div>
+                <div>
+                    <h2>COMPANY NAME</h2>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Company Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                <p><a href="#" class="text-white">About Us</a></p>
+                <p><a href="#" class="text-white">Careers</a></p>
+                <p><a href="#" class="text-white">Team</a></p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact and Download Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+                
+                <p>Better Experience, Download The App</p>
+                
+                <!-- App Download Links -->
+                <div class="d-flex justify-content-center">
+                    <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                    <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact Information -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                <p><i class="bi bi-telephone"></i> +1122334455</p>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <!-- Copyright and Social Media Links -->
+        <div class="row d-flex align-items-center">
+            
+            <!-- Left spacing -->
+            <div class="col-md-4"></div>
+            
+            <!-- Copyright Notice -->
+            <div class="col-md-4 text-center">
+                <div>© 2020 Copyright:</div>
+            </div>
+            
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-md-end">
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>seller</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    <!-- Latest compiled and minified CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery (required for Bootstrap's JavaScript) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    {% load static %}
+<link rel="stylesheet" href="{% static 'css/seller.css'%}">
+<script type="text/javascript">
+  // Prevent back button by manipulating history
+  window.history.pushState(null, null, window.location.href);
+  window.onpopstate = function () {
+      window.history.pushState(null, null, window.location.href);
+  };
+</script>
+</head>
+<header>
+  <div class="row text-center navbar " 
+       style="background-color: rgb(33, 182, 33); ">
+    <div class="col-1 nav-item">
+      <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:85%; width:85%;">
+    </div>
+    <div class="col-2"></div>
+    <div class="col-7 nav-item">
+      <div>
+        <form class="d-flex align-items-center position-relative">
+          <!-- Search Input -->
+          <input
+            class="form-control fs-6"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            style="padding-right: 40px;"
+          />
+          <span class="search_search_icon__LSw6F" 
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+            <img src="https://img.crofarm.com/otipyecom/assets/svg/SmallSearch.svg" alt="">
+          </span>
+        </form>
+      </div>  
+    </div>
+    <div class="col-2 nav-item">
+      <a class="btn" onclick="toggle_div('profile1-details')" style="font-size: 30px;">
+        <i class="bi bi-person-circle"></i>
+      </a>
+    </div>
+  </div>
+</header>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Column (2 columns wide) -->
+<div class="col-auto col-md-2 col-xl-2 px-0">
+  <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 sticky" style=" background-color: #343a40;">
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+          <li class="nav-item mb-2" id="click">
+              <a onclick="toggle_div('item-details')" class="btn text-start text-white" id="click">
+                  <i class="bi bi-bell-fill me-2 text-white"></i>
+                  <span class="ms-1 d-none d-sm-inline">Item</span>
+              </a>
+          </li>
+          <li class="nav-item mb-2">
+              <a onclick="toggle_div('order-details')" class="btn w-100 text-start text-white" id="click">
+                  <i class="bi bi-bag-check-fill me-2 text-white"></i>
+                  <span class="ms-1 d-none d-sm-inline">Orders</span>
+              </a>
+          </li>
+          <li class="nav-item mb-2">
+              <a onclick="toggle_div('review-details')" class="btn w-100 text-start text-white" id="click">
+                  <i class="bi bi-list-stars me-2 text-white"></i>
+                  <span class="ms-1 d-none d-sm-inline">Reviews</span>
+              </a>
+          </li>
+          <li class="nav-item mb-2">
+              <a href="{% url 'contactUs_form' %}" class="btn w-100 text-start text-white" id="click">
+                  <i class="bi bi-card-text me-2 text-white"></i>
+                  <span class="ms-1 d-none d-sm-inline">Support</span>
+              </a>
+          </li>
+          <li class="nav-item mb-2">
+              <a onclick="toggle_div('settings-details')" class="btn w-100 text-start text-white" id="click">
+                  <i class="bi bi-person-circle me-2 text-white"></i>
+                  <span class="ms-1 d-none d-sm-inline">Personal Info</span>
+              </a>
+          </li>
+          <li class="nav-item">
+              <a href="{% url 'logout' %}" class="btn btn-danger w-100 text-start">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  <span class="ms-1 d-none d-sm-inline">Logout</span>
+              </a>
+          </li>
+      </ul>
+  </div>
+</div>
+
+        <!-- Main Content Column (10 columns wide) -->
+        <div class="col-10">
+          <!-- Floating Add Item Button -->
+         
+            <!-- Profile Details Section -->
+         <div id="profile1-details" class="account-details" style="display: none;">
+  <h2 class="text-center fw-bold text-success mb-4 mt-4" 
+                  style="letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);">
+                  <i class="bi bi-person-circle me-2"></i> Seller Profile
+              </h2>
+              
+  <div class="container my-5">
+      <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6 bg-white shadow-lg rounded p-4" style="border: 1px solid #ddd;">
+              
+              
+              <div class="text-center">
+                  <!-- Profile Image -->
+                  <div class="position-relative d-inline-block">
+                      <img id="profile_image_preview"
+                          src="{% if profile_image %}{{ profile_image }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}"
+                          alt="Profile Image"
+                          class="rounded-circle border"
+                          style="height: 130px; width: 130px; object-fit: cover; border: 4px solid #28a745;">
+                  </div>
+
+                  <!-- Profile Details -->
+                  <h3 class="mt-3 fw-bold text-dark">{{ seller.name }}</h3>
+                  <p class="text-muted">{{ seller.email }}</p>
+
+                  <hr>
+
+                  <div class="text-start mt-3">
+                      <p><i class="bi bi-telephone-fill text-primary me-2"></i> <strong>Mobile No:</strong> {{ seller.mobileNo }}</p>
+                      <p><i class="bi bi-geo-alt-fill text-danger me-2"></i> <strong>Address:</strong> {{ seller.address }}</p>
+                      <p><i class="bi bi-file-earmark-text-fill text-warning me-2"></i> <strong>GST No:</strong> {{ seller.gst_no }}</p>
+                      <p><i class="bi bi-shop text-success me-2"></i> <strong>Shop Name:</strong> {{ seller.shop_name }}</p>
+                  </div>
+
+                  <hr>
+              </div>
+          </div>
+      </div>
+  </div>
+           </div>
+
+          
+         <div id="settings-details" class="account-details" style="margin-top: 60px;">
+  <!-- Display Mode -->
+  <div id="display-mode" class="profile-card p-4 rounded shadow-lg bg-white" style="max-width: 600px; margin: auto;">
+      <div class="profile-header d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-center fw-bold text-success mb-4 mt-4" 
+        style="letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);">
+         Update Profile
+    </h2>
+    
+          <i class="bi bi-pencil-square edit-icon text-primary" onclick="toggleEditMode()" style="font-size: 1.5rem; cursor: pointer;"></i>
+      </div>
+      <hr>
+      <div class="text-center mb-4">
+          <img id="profile_image_preview"
+               src="{% if seller.profile_image_seller %}{{ seller.profile_image_seller.url }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}"
+               alt="Profile Image"
+               class="rounded-circle"
+               style="height: 120px; width: 120px; object-fit: cover; border: 4px solid #ddd;">
+      </div>
+      <div class="profile-info">
+          <p><strong>Name:</strong> {{ seller.name }}</p>
+          <p><strong>Email:</strong> {{ seller.email }}</p>
+          <p><strong>Mobile No:</strong> {{ seller.mobileNo }}</p>
+          <p><strong>Address:</strong> {{ seller.address }}</p>
+          <p><strong>GST No:</strong> {{ seller.gst_no }}</p>
+          <p><strong>Shop Name:</strong> {{ seller.shop_name }}</p>
+      </div>
+  </div>
+  
+  <!-- Edit Mode -->
+  <form id="edit-mode" style="display: none;" method="POST" enctype="multipart/form-data" class="mt-4 p-4 rounded shadow-lg bg-white" style="max-width: 600px; margin: auto;">
+      {% csrf_token %}
+      <div class="text-center mb-3">
+          <img id="profile_image_preview_edit"
+               src="{% if seller.profile_image_seller %}{{ seller.profile_image_seller.url }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}"
+               alt="Profile Image"
+               class="rounded-circle"
+               style="height: 120px; width: 120px; object-fit: cover; border: 4px solid #ddd;">
+          <input type="file" id="profile_image_input" name="profile_image_seller" style="display: none;" onchange="previewImage(event)">
+          <button type="button" class="btn btn-outline-primary mt-2" onclick="document.getElementById('profile_image_input').click();">Change Profile Image</button>
+      </div>
+  
+      <div class="mb-3">
+          <label for="mobileNo" class="form-label">Mobile No:</label>
+          <input type="text" id="mobileNo" name="mobileNo" value="{{ seller.mobileNo }}" class="form-control">
+      </div>
+      <div class="mb-3">
+          <label for="address" class="form-label">Address:</label>
+          <textarea id="address" name="address" class="form-control" rows="4">{{ seller.address }}</textarea>
+      </div> 
+      <div class="mb-3">
+          <label for="shop_name" class="form-label">Shop Name:</label>
+          <input type="text" id="shop_name" name="shop_name" value="{{ seller.shop_name }}" class="form-control">
+      </div>
+  
+      <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-danger" onclick="toggleEditMode()">Cancel</button>
+      </div>
+  </form>
+        </div>
+
+                 <!-- Order Details Section -->
+<div id="order-details" class="account-details" style="display: none;">
+  <h3 class="text-center mt-4 fw-bold text-uppercase" 
+      style="font-size: 2.5rem; color: #28a745; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);">
+      🛒 Order Details
+  </h3>
+
+  <div class="table-responsive mx-5 mt-4">
+      <table class="table table-bordered table-striped">
+          <thead class="table-success text-center">
+              <tr>
+                  <th>Order ID</th>
+                  <th>Order Date</th>
+                  <th>Buyer Name</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Grand Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for enriched_order in orders %}
+              <tr>
+                  <td>{{ enriched_order.order.id }}</td>
+                  <td>{{ enriched_order.order.created_at }}</td>
+                  <td>{{ enriched_order.buyer_name }}</td>
+                  <td>{{ enriched_order.buyer_phone }}</td>
+                  <td>{{ enriched_order.buyer_address }}</td>
+                  <td><strong>₹{{ enriched_order.order.grand_total }}</strong></td>
+                  
+                  <!-- Handle Order Status -->
+                  <td>
+                      {% if enriched_order.order.is_cancelled %}
+                          <!-- If the order is cancelled, show the item as cancelled -->
+                          <span class="badge bg-secondary">Cancelled</span>
+                      {% else %}
+                          <!-- Iterate over each item in the order -->
+                          {% for item in enriched_order.order.items.all %}
+                              <span class="badge 
+                                  {% if item.status == 'pending' %} bg-warning
+                                  {% elif item.status == 'picked_up' %} bg-primary
+                                  {% elif item.status == 'delivered' %} bg-success
+                                  {% else %} bg-secondary {% endif %}">
+                                  {{ item.status }}
+                              </span>
+                          {% endfor %}
+                      {% endif %}
+                  </td>
+                  <td>
+                      <button class="btn btn-info btn-sm" onclick="toggleOrderDetails({{ enriched_order.order.id }})">
+                          View Details
+                      </button>
+                  </td>
+              </tr>
+
+              <!-- Hidden Order Details (Modal) -->
+              <tr id="order-details-{{ enriched_order.order.id }}" style="display: none;">
+                  <td colspan="8">
+                      <div class="p-3 border rounded bg-light">
+                          <h5>Order Items</h5>
+                          <table class="table table-sm table-bordered">
+                              <thead class="table-secondary">
+                                  <tr>
+                                      <th>Item</th>
+                                      <th>Quantity</th>
+                                      <th>Item Price</th>
+                                      <th>Total Price</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for item in enriched_order.order.items.all %}
+                                  <tr>
+                                      <td>{{ item.item.name }}</td>
+                                      <td>{{ item.quantity }} kg</td>
+                                      <td>₹{{ item.price }}</td>
+                                      <td>₹{{ item.total_price }}</td>
+                                     
+                                      
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                          <button class="btn btn-danger btn-sm mt-2" onclick="toggleOrderDetails({{ enriched_order.order.id }})">Close</button>
+                      </div>
+                  </td>
+              </tr>
+
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+
+
+
+          <div id="review-details" class="account-details" style="display: none;">
+            <!-- Reviews Heading -->
+            <h2 class="text-center fw-bold text-primary mb-4 mt-2" 
+                style="letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);">
+                <i class="bi bi-star-fill me-2 text-warning"></i> Customer Reviews
+            </h2>
+        
+            <div class="container-fluid">
+                <div class="row ">
+                    <div class="col-12 bg-white shadow-lg rounded p-2" style="border: 1px solid #ddd;">
+                        <div class="reviews-section">
+                            {% if buyer_reviews %}
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Rating</th>
+                                            <th>Buyer</th>
+                                            <th>Review</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for review in buyer_reviews %}
+                                            <tr>
+                                                <td>{{ review.item.name }}</td>
+                                                <td>
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-star-fill"></i> {{ review.rating }}/5
+                                                    </span>
+                                                </td>
+                                                <td>{{ review.buyer.name }}</td>
+                                                <td>{{ review.review }}</td>
+                                                <td>{{ review.created_at|date:"F j, Y, g:i a" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p class="text-center text-muted">No reviews available for your items yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        
+        
+        
+
+         <!-- Item List Section -->
+         <div id="item-details" class="account-details" style="display: none;">
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-success rounded-circle position-fixed" 
+                style="width: 50px; height: 50px; font-size: 24px; bottom: 20px; right: 20px; z-index: 1050;" 
+                data-bs-toggle="tooltip" data-bs-placement="top" title="Add Item" 
+                onclick="add_product()" id="add-item-button">
+                <i class="bi bi-plus"></i>
+                </button>
+              </div>
+  <h1 class="text-center fw-bold text-uppercase" 
+      style="font-size: 3rem; color: #007bff; letter-spacing: 1px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); margin-top: 30px;">
+      📦 Item List
+  </h1>
+  
+  <div class="table-responsive mx-5 mt-4">
+    <table class="table table-bordered table-striped table-hover" style="border-radius: 10px; border-collapse: collapse;">
+      <thead class="table-success text-center" style="background-color: #007bff; color: white;">
+        <tr>
+          <th>Image</th>
+          <th>Item Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Offer</th>
+          <th>Category</th>
+          <th>Expiry Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr class="{% if item.is_expired %}expired-item{% endif %}">
+          <!-- Image Column -->
+          <td class="text-center">
+            <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                {% for image in item.images.all %}
+                  <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.image.url }}" alt="{{ item.name }}" style="height: 50px; object-fit: cover;">
+                  </div>
+                {% endfor %}
+              </div>
+              <!-- Carousel Controls -->
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev"></button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next"></button>
+            </div>
+          </td>
+  
+          <!-- Item Details Columns -->
+          <td>{{ item.name }}</td>
+          <td>₹{{ item.price_kg }}</td>
+          <td>{{ item.quantity }} kg</td>
+          <td>{{ item.offfer }}%</td>
+          <td>{{ item.category }}</td>
+  
+          <!-- Expiry Date Column -->
+          <td class="expiry-date">
+            {% if item.is_expired %}
+              <span class="text-danger">Expired</span>
+            {% else %}
+              {{ item.ex_date }}
+            {% endif %}
+          </td>
+  
+          <!-- Action Button Column -->
+          <td class="text-center">
+            {% if item.is_expired %}
+              <!-- Disable Edit button for expired items -->
+              <button class="btn btn-secondary btn-sm" disabled>Expired</button>
+            {% else %}
+              <button class="btn btn-danger btn-sm edit-btn" data-item-id="{{ item.id }}" data-expiry-date="{{ item.ex_date }}">Edit</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Edit Expiry Date Modal -->
+  <div class="modal fade" id="editExpiryModal" tabindex="-1" aria-labelledby="editExpiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editExpiryModalLabel">Edit Expiry Date</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editExpiryForm" method="POST" action="{% url 'item_add' %}">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" id="item_id">
+            <div class="mb-3">
+              <label for="expiry_date" class="form-label">New Expiry Date</label>
+              <input type="date" class="form-control" id="expiry_date" name="expiry_date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+           
+        </div>
+    </div>
+</div> 
+
+  <!-- Overlay for form -->
+  <div id="overlay1" onclick="add_product()"></div>
+  
+  <!-- Form for adding an item -->
+  <div id="form_add" style="display: none;">
+    <div class="container">
+      <form action="{% url 'item_save' %}" method="POST" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+  
+        <div class="row mt-5">
+  
+          <div class="col-md-6">
+            <!-- Item Type Field -->
+            <div class="form-floating">
+              <select name="type" id="itemType" class="form-select">
+                <option selected></option>
+                <option value="fruits">Fruits</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="exotic fruits">Exotic Fruits</option>
+                <option value="exotic vegetables">Exotic Vegetables</option>
+                <option value="mashrooms">Mashroom</option>
+                <option value="salad items">Salad Items</option>
+              </select>
+              <label for="itemType">Item Type</label>
+            </div>
+  
+            <!-- Item Name Field -->
+            <div class="form-floating mt-3">
+              <input type="text" class="form-control" name="item_name" id="itemName">
+              <label for="itemName">Item Name</label>
+            </div>
+  
+            <!-- Item Quantity Field -->
+            <div class="form-floating mt-3">
+              <input type="number" class="form-control" name="quantity" id="itemQuantity">
+              <label for="itemQuantity">Item Quantity</label>
+            </div>
+  
+            <!-- Item Category Field -->
+            <div class="form-floating mt-3">
+              <select name="category" id="itemCategory" class="form-select">
+                <option selected></option>
+                <option value="kitchen garden">Kitchen Garden</option>
+                <option value="native farm">Native Farm</option>
+                <option value="imported">Imported</option>
+                <option value="polyhouse">Polyhouse</option>
+                <option value="organic">Organic</option>
+              </select>
+              <label for="itemCategory">Item Category</label>
+            </div>
+  
+            <!-- Price per KG Field -->
+            <div class="form-floating mt-3">
+              <input class="form-control" type="number" name="price_kg" id="pricePerKg">
+              <label for="pricePerKg">Price per Kg</label>
+            </div>
+  
+            <!-- Bulk Purchase Minimum Requirement Field -->
+            <div class="form-floating mt-3">
+              <input class="form-control" type="text" name="bulk" id="bulkRequirement">
+              <label for="bulkRequirement">Bulk Purchase Minimum Requirement</label>
+            </div>
+  
+            <!-- Bulk Purchase Price Field -->
+            <div class="form-floating mt-3">
+              <input class="form-control" type="number" name="bulk_price" id="bulkPrice">
+              <label for="bulkPrice">Bulk Purchase Price</label>
+            </div>
+  
+            <!-- Offer Field -->
+            <div class="form-floating mt-3">
+              <input type="text" class="form-control" name="offer" id="offerField">
+              <label for="offerField">Offers</label>
+            </div>
+  
+            <!-- Expiry Date Field -->
+            <div class="form-floating mt-3">
+              <input type="date" class="form-control" name="ex_date" id="expiryDate">
+              <label for="expiryDate">Expiry Date</label>
+            </div>
+  
+            <!-- Merchant Specification Field -->
+            <div class="form-floating mt-3">
+              <textarea name="specification" rows="5" class="form-control" id="merchantSpecification"></textarea>
+              <label for="merchantSpecification">Merchant Specification (if any)</label>
+            </div>
+  
+            <div class="row mt-3">
+              <div class="col-12">
+                <button type="button" class="btn btn-primary mb-3" onclick="document.getElementById('imageInput').click();">Select Images</button>
+  
+                <input type="file" class="form-control" id="imageInput" name="images" multiple style="display: none;">
+              </div>
+            </div>
+          </div>   
+  
+          <div class="col-md-6 mt3">
+            <div id="formPreviewContainer"></div>
+            <div id="imagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
+          </div>
+  
+          <div class="button-container" style="position: sticky; bottom: 0; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; justify-content: space-between;">
+            <a class="btn btn-secondary" type="button" href="{% url 'item_add' %}">Cancel</a>
+            <button class="btn btn-success" type="submit" onclick="">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+<script>
+  
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const imageInput = document.getElementById('imageInput');
+let tempImages = [];
+
+  function add_product() {
+  const formElement = document.getElementById('form_add');
+  const overlayElement = document.getElementById('overlay1');
+  
+  // Toggle visibility of form and overlay
+  if (formElement.style.display === 'block') {
+    formElement.style.display = 'none';
+    overlayElement.style.display = 'none';
+  } else {
+    formElement.style.display = 'block';
+    overlayElement.style.display = 'block';
+  }
+}
+<!-- JavaScript to handle the modal and populate fields -->
+
+    // Get all edit buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Get the item ID and current expiry date from the data attributes
+        var itemId = this.getAttribute('data-item-id');
+        var expiryDate = this.getAttribute('data-expiry-date');
+  
+        // Set the values in the modal
+        document.getElementById('item_id').value = itemId;
+        document.getElementById('expiry_date').value = expiryDate;
+  
+        // Show the modal
+        new bootstrap.Modal(document.getElementById('editExpiryModal')).show();
+      });
+    });
+function toggleOrderDetails(orderId) {
+    var detailsRow = document.getElementById("order-details-" + orderId);
+    if (detailsRow.style.display === "none") {
+        detailsRow.style.display = "table-row";
+    } else {
+        detailsRow.style.display = "none";
+    }
+}
+ // Function to toggle sections visibility
+function toggle_div(divId) {
+  // Hide all sections
+  const divs = document.querySelectorAll('.account-details');
+  divs.forEach(div => div.style.display = 'none');
+
+  // Show the selected section
+  const selectedDiv = document.getElementById(divId);
+  if (selectedDiv) {
+    selectedDiv.style.display = 'block';
+    sessionStorage.setItem("activeSection", divId);
+  }
+
+  // Show or hide the "Add Item" button based on section
+  const addItemButton = document.getElementById('add-item-button');
+  if (divId === 'item-details') {
+    addItemButton.style.display = 'block'; // Show button for "Item Details"
+  } else {
+    addItemButton.style.display = 'none'; // Hide button for other sections
+  }
+}
+
+
+
+// Preview Image Function
+function previewImage(event) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    document.getElementById('profile_image_preview').src = reader.result;
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
+   //handle page after refresh
+   document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the last active section from sessionStorage
+    const activeSection = sessionStorage.getItem("activeSection") || "item-details"; // Default to "dashboard"
+
+    // Hide all sections
+    document.querySelectorAll(".account-details").forEach(div => div.style.display = "none");
+
+    // Show the active section
+    const selectedDiv = document.getElementById(activeSection);
+    if (selectedDiv) {
+        selectedDiv.style.display = "block";
+    }
+});
+function handleImageUpload(event) {
+    const files = Array.from(event.target.files);
+    imagePreviewContainer.innerHTML = ''; // Clear existing previews
+
+    files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const previewDiv = document.createElement('div');
+            previewDiv.classList.add('image-preview');
+            previewDiv.setAttribute('data-index', index);
+
+            previewDiv.innerHTML = `
+                <img src="${e.target.result}" alt="Image Preview" style="max-width: 100px; height: 100px;">
+                <button type="button" class="close-btn" data-index="${index}">&times;</button>
+            `;
+
+            previewDiv.querySelector('.close-btn').addEventListener('click', () => removeImage(index));
+            imagePreviewContainer.appendChild(previewDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Sync files with tempImages
+    tempImages = files;
+    updateFileInput();
+}
+
+function removeImage(index) {
+    tempImages.splice(index, 1); // Remove the image from tempImages
+    renderPreviews();
+    updateFileInput(); // Update the file input with the new tempImages array
+}
+
+function renderPreviews() {
+    imagePreviewContainer.innerHTML = '';
+    tempImages.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const previewDiv = document.createElement('div');
+            previewDiv.classList.add('image-preview');
+            previewDiv.setAttribute('data-index', index);
+            previewDiv.innerHTML = `
+                <img src="${e.target.result}" alt="Image Preview" style="max-width: 100px; height: 100px;">
+                <button type="button" class="close-btn" data-index="${index}">&times;</button>
+            `;
+            previewDiv.querySelector('.close-btn').addEventListener('click', () => removeImage(index));
+            imagePreviewContainer.appendChild(previewDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function updateFileInput() {
+    const dataTransfer = new DataTransfer(); // Create a new DataTransfer object
+    tempImages.forEach((file) => dataTransfer.items.add(file));
+    imageInput.files = dataTransfer.files; // Assign updated files to the input
+}
+
+// Update Form Data Preview
+function updateFormPreview() {
+    const formData = new FormData(document.getElementById('uploadForm'));
+    formPreviewContainer.innerHTML = ''; // Clear previous preview
+
+    // Create a container for the form data preview
+    const dataPreviewDiv = document.createElement('div');
+    dataPreviewDiv.classList.add('form-data-preview');
+
+    // Loop through all form fields (except image files)
+    for (const [key, value] of formData.entries()) {
+        if (key === 'images' || key === 'csrfmiddlewaretoken') continue;
+
+        const previewItem = document.createElement('p');
+        previewItem.innerHTML = ` <strong>${key.replace(/_/g, ' ')}:</strong> ${value || 'N/A'}`;
+
+        dataPreviewDiv.appendChild(previewItem);
+    }
+
+    formPreviewContainer.appendChild(dataPreviewDiv);
+}
+
+// Add event listeners to form inputs
+document.querySelectorAll('#uploadForm input, #uploadForm select, #uploadForm textarea').forEach((input) => {
+    input.addEventListener('input', updateFormPreview);
+});
+
+
+function resetForm() {
+    document.getElementById('uploadForm').reset();
+    imagePreviewContainer.innerHTML = '';
+    formPreviewContainer.innerHTML = '';
+    tempImages = [];
+    imageInput.value = '';
+}
+
+window.addEventListener('load', resetForm);
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function toggleEditMode() {
+  const displayMode = document.getElementById('display-mode');
+  const editMode = document.getElementById('edit-mode');
+  if (displayMode.style.display === 'none') {
+    displayMode.style.display = 'block';
+    editMode.style.display = 'none';
+  } else {
+    displayMode.style.display = 'none';
+    editMode.style.display = 'block';
+  }
+}
+
+function previewImage(event) {
+  const preview = document.getElementById('profile_image_preview_edit');
+  preview.src = URL.createObjectURL(event.target.files[0]);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (imageInput) {
+        imageInput.addEventListener('change', handleImageUpload);
+    }
+});
+
+</script>
+
+</body>
+
+<footer class="text-lg-start text-white" style="background-color: #42af17">
+  <div class="container p-4 pb-0">
+      <div class="row">
+          
+          <!-- Company Logo and Name -->
+          <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+              <div>
+                  <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+              </div>
+              <div>
+                  <h2>COMPANY NAME</h2>
+              </div>
+          </div>
+
+          <hr class="w-100 clearfix d-md-none" />
+
+          <!-- Company Links -->
+          <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+              <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+              <p><a href="#" class="text-white">About Us</a></p>
+              <p><a href="#" class="text-white">Careers</a></p>
+              <p><a href="#" class="text-white">Team</a></p>
+          </div>
+
+          <hr class="w-100 clearfix d-md-none" />
+
+          <!-- Contact and Download Links -->
+          <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+              <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+              <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+              <p><a href="{% url 'signUp' %}" class="text-white">Be A Shopper</a></p>
+              <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+              
+              <p>Better Experience, Download The App</p>
+              
+              <!-- App Download Links -->
+              <div class="d-flex justify-content-center">
+                  <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                  <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+              </div>
+          </div>
+
+          <hr class="w-100 clearfix d-md-none" />
+
+          <!-- Contact Information -->
+          <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+              <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+              <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+              <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+              <p><i class="bi bi-telephone"></i> +1122334455</p>
+          </div>
+      </div>
+
+      <hr class="my-3">
+
+      <!-- Copyright and Social Media Links -->
+      <div class="row d-flex align-items-center">
+          
+          <!-- Left spacing -->
+          <div class="col-md-4"></div>
+          
+          <!-- Copyright Notice -->
+          <div class="col-md-4 text-center">
+              <div>© 2020 Copyright:</div>
+          </div>
+          
+          <!-- Social Media Icons -->
+          <div class="col-md-4 text-md-end">
+              <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+              <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+              <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+              <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+          </div>
+      </div>
+  </div>
+</footer>
+
+</html>

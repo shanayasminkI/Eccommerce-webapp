@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Agent Dashboard</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    
+   <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (required for Bootstrap's JavaScript) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/deliveryAgent.css'%}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    
+    <style>
+        section {
+            display: none;
+        }
+        section.active {
+            display: block;
+        }
+        
+
+    </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        
+</head>
+<header>
+    <div class="row navbar"  style="background-color: rgb(33, 182, 33); ">
+        <div class="col-2 nav-item">
+            <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:35%; width:35%;">
+        </div>
+        <div class="col-1 nav-item"></div>
+        <div class="col-6 nav-item">
+            <div>
+                <form class="d-flex search-container" method="POST">
+                  <input class="form-control" type="text" placeholder="Search">
+                  <button class="btn btn-primary rounded-3 ms-2" type="submit">Search</button>
+                </form>
+              </div>
+        </div>
+        <div class="col-1 nav-item"></div>
+        <div class="col-2 nav-item">
+            <a class="btn"onclick="toggleSection('profile')" style="font-size: 30px;">
+                <i class="bi bi-person-circle"></i>
+                </a>
+        </div>
+    </div>
+</header>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-sm-2 sidebar p-3">
+                <button class="btn btn-dark mb-3" onclick="toggleSection('dashboard')">Dashboard</button>
+                <button class="btn btn-dark mb-3" onclick="toggleSection('orders')">New Orders</button>
+                <button class="btn btn-dark mb-3" onclick="toggleSection('picked-up-orders')">Picked Up Orders</button>
+                <button class="btn btn-dark mb-3" onclick="toggleSection('completed-orders')">Completed Orders</button>
+                <button class="btn btn-dark mb-3" onclick="toggleSection('earnings')">Earnings</button>
+                <a href="{% url 'contactUs_form' %}" class="btn btn-dark mb-3 d-block text-start">Support</a>
+                <button class="btn btn-dark mb-3" onclick="toggleSection('settings')">Settings</button>
+                <a class="btn btn-danger mt-auto" href="{% url 'logout'%}">Logout</a>
+            </div>
+    
+            <!-- Main Content -->
+            <div class="col-sm-10 p-4">
+
+<section id="settings" class="settings-section">
+<!-- Hidden form -->
+<form method="POST" action="{% url 'deliveryAgent' %}" class="settings-form" id="settings-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- Profile Image Preview and Change Option -->
+    <div class="text-center profile-image-container">
+        <img id="profile_image_preview" 
+            src="{% if profile_image %}{{ profile_image }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}" 
+            alt="Profile Image" class="profile-image">
+        
+        <input type="file" id="profile_image_input" name="profile_image" style="display: none;" onchange="previewImage(event)">
+        <button type="button" class="btn-change-profile" onclick="document.getElementById('profile_image_input').click();">Change Profile Image</button>
+    </div>
+    
+    <!-- Personal Information Fields -->
+    <div class="form-group">
+        <label for="mobileNo">Mobile Number:</label>
+        <input type="text" id="mobileNo" name="mobileNo" value="{{ mobileNo }}" class="form-input">
+    </div>
+    <div class="form-group">
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" class="form-input">{{ address }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="driving_license_no">Driving License Number:</label>
+        <input type="text" id="driving_license_no" name="driving_license_no" value="{{ driving_license_no }}" class="form-input">
+    </div>
+    <div class="form-group">
+        <label for="vehicle_no">Vehicle Number:</label>
+        <input type="text" id="vehicle_no" name="vehicle_no" value="{{ vehicle_no }}" class="form-input">
+    </div>
+    <div class="form-group">
+        <label for="preferred_location">Preferred Location:</label>
+        <input type="text" id="preferred_location" name="preferred_location" value="{{ preferred_location }}" class="form-input">
+    </div>
+    
+    <!-- Submit Button -->
+    <button type="submit" class="form-submit-button">Update</button>
+</form>
+             <!-- Display success or error message -->
+             {% if messages %}
+             <div class="alert alert-success">
+                 {% for message in messages %}
+                     <p>{{ message }}</p>
+                 {% endfor %}
+             </div>
+             {% endif %}
+</section>
+
+                <section id="dashboard" class="active">
+                    <h2 class="dashboard-title">Dashboard</h2>
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-info text-white" onclick="toggleSection('orders')"> <!-- New Orders: Light Blue -->
+                                <div class="card-body">
+                                    <h5>New Orders</h5>
+                                    <p class="display-4">{{ pending_orders_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-warning text-white" onclick="toggleSection('picked-up-orders')"> <!-- Active Deliveries: Yellow -->
+                                <div class="card-body">
+                                    <h5>Active Deliveries</h5>
+                                    <p class="display-4">{{ active_deliveries_count}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-success text-white" onclick="toggleSection('completed-orders')"> <!-- Completed Deliveries: Green -->
+                                <div class="card-body">
+                                    <h5>Completed Deliveries</h5>
+                                    <p class="display-4">{{ completed_orders_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="orders">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <h1 class="new-orders-title text-center mb-4">New Orders</h1>
+                            <thead class="bg-dark text-white">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer Name</th>
+                                    <th>Buyer Address</th>
+                                    <th>Seller Name</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Grand Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_id, order_data in grouped_orders.items %}
+                                    {% for enriched_order in order_data.order_items %}
+                                        <tr data-order-id="{{ order_id }}">
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ order_id }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.buyer_name }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.buyer_address }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">{{ enriched_order.seller_name }}</td>
+                                            {% endif %}
+                                            <td>{{ enriched_order.order_item.item.name }}</td>
+                                            <td>{{ enriched_order.order_item.quantity }} kg</td>
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}">
+                                                    <span style="
+                                                        {% if enriched_order.order_item.status == 'pending' %}color:orange;font-weight: bold;{% elif enriched_order.order_item.status == 'picked_up' %}color:blue;font-weight: bold;{% elif enriched_order.order_item.status == 'delivered' %}color:green;font-weight: bold;{% elif enriched_order.order_item.status == 'issue' %}color:red;font-weight: bold;{% else %}color:black;{% endif %}
+                                                    ">
+                                                        {{ enriched_order.order_item.status }}
+                                                    </span>
+                                                </td>
+                                                <td rowspan="{{ order_data.order_items|length }}">${{ order_data.grand_total|floatformat:2 }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}">
+                                                    <button type="button" class="btn btn-primary" 
+                                                        onclick="updatePickedOrderStatus('{{ order_id }}', 'picked_up')">
+                                                        Mark as Picked Up
+                                                    </button>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                 
+                 <section id="picked-up-orders">
+                    <h1 class="picked-up-orders-title text-center mb-4">Picked Up Orders</h1>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer Name</th>
+                                    <th>Buyer Address</th>
+                                    <th>Seller Name</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Grand Total</th>
+                                    <th>Actions</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_id, order_data in grouped_picked_up_orders.items %}
+                                    {% for enriched_order in order_data.order_items %}
+                                        <tr data-order-id="{{ order_id }}">
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ order_id }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.buyer_name }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.buyer_address }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.seller_name }}</td>
+                                            {% endif %}
+                                            <td class="text-center align-middle">{{ enriched_order.order_item.item.name }}</td>
+                                            <td class="text-center align-middle">{{ enriched_order.order_item.quantity }} kg</td>
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">${{ order_data.grand_total|floatformat:2 }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <button class="btn btn-primary btn-sm px-3" onclick="updatePickedOrderStatus('{{ order_id }}', 'delivered')">
+                                                            <i class="bi bi-check-circle"></i> Mark Delivered
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm px-3" onclick="updatePickedOrderStatus('{{ order_id }}', 'issue')">
+                                                            <i class="bi bi-exclamation-circle"></i> Report Issue
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </section>                    
+ 
+                <section id="completed-orders">
+                    <h1 class="completed-orders-title text-center mb-4">Completed Orders</h1>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer Name</th>
+                                    <th>Buyer Address</th>
+                                    <th>Seller Name</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Grand Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_id, order_data in grouped_completed_orders.items %}
+                                    {% for enriched_order in order_data.order_items %}
+                                        <tr data-order-id="{{ order_id }}">
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ order_id }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.buyer_name }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.buyer_address }}</td>
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">{{ enriched_order.seller_name }}</td>
+                                            {% endif %}
+                                            <td class="text-center align-middle">{{ enriched_order.order_item.item.name }}</td>
+                                            <td class="text-center align-middle">{{ enriched_order.order_item.quantity }} kg</td>
+                                            {% if forloop.first %}
+                                                <td rowspan="{{ order_data.order_items|length }}" class="text-center align-middle">${{ order_data.grand_total|floatformat:2 }}</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+
+                <section id="earnings">
+                    <div id="earnings-container">
+                        <h2 id="earnings-heading">Earnings</h2>
+                        <p><strong>Total Earnings:</strong>  ₹150</p>
+                        <p><strong>Pending Payments:</strong> ₹30</p>
+                        <button id="request-payout-button">Request Payout</button>
+                    </div>
+                </section>
+    
+                <section id="profile">
+                    <div class="container my-5">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8 col-lg-6 bg-white shadow-lg rounded-3 p-5">
+                                <!-- Profile Image Section -->
+                                <div class="text-center mb-4">
+                                    <img id="profile_image_preview"
+                                         src="{% if profile_image %}{{ profile_image }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}"
+                                         alt="Profile Image"
+                                         class="profile-img">
+                                    <h3 class="mt-4 font-weight-bold text-dark">{{ name }}</h3>
+                                    <p class="text-muted">{{ email }}</p>
+                                </div>
+                                
+                                <!-- Profile Information Section -->
+                                <div class="profile-info">
+                                    <div class="profile-info-item">
+                                        <strong class="text-dark">Mobile Number:</strong>
+                                        <p class="text-muted">{{ mobileNo }}</p>
+                                    </div>
+                                    <div class="profile-info-item">
+                                        <strong class="text-dark">Address:</strong>
+                                        <p class="text-muted">{{ address }}</p>
+                                    </div>
+                                    <div class="profile-info-item">
+                                        <strong class="text-dark">Driving License No:</strong>
+                                        <p class="text-muted">{{ driving_license_no }}</p>
+                                    </div>
+                                    <div class="profile-info-item">
+                                        <strong class="text-dark">Vehicle No:</strong>
+                                        <p class="text-muted">{{ vehicle_no }}</p>
+                                    </div>
+                                    <div class="profile-info-item">
+                                        <strong class="text-dark">Preferred Location:</strong>
+                                        <p class="text-muted">{{ preferred_location }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+    
+               
+                        
+            </div>
+        </div>
+    </div>
+    
+        
+    <script>
+
+    // Prevent back button by manipulating history
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.history.pushState(null, null, window.location.href);
+    };
+
+        function toggleSection(sectionId) {
+            const sections = document.querySelectorAll("section");
+            sections.forEach(section => section.classList.remove("active"));
+    
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add("active");
+                localStorage.setItem("activeSection",sectionId)
+            }
+        }
+        
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+        document.getElementById('profile_image_preview').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+    // Handle form submission
+    function handleFormSubmit(event) {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        // Simulate successful submission (you can remove this if the page reloads or redirects)
+        const form = document.getElementById("settings-form");
+        const toggleButton = document.getElementById("toggle-form-button");
+
+        // Hide the form and reset the button text
+        form.style.display = "none";
+        toggleButton.textContent = "Update Personal Information";
+
+        // Optionally display a success message
+        alert("Form updated successfully!");
+
+        // You can remove this block if the form submission reloads the page
+        form.reset(); // Clear the form fields
+    }
+
+    function updatePickedOrderStatus(orderId, newStatus) {
+    const csrfToken = '{{ csrf_token }}';
+
+    fetch("{% url 'update_order_status' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ order_id: orderId, status: newStatus }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove all rows corresponding to the orderId
+            document.querySelectorAll(`[data-order-id="${orderId}"]`).forEach(row => row.remove());
+
+            alert(`Order status updated to '${newStatus}' successfully.`);
+        } else {
+            alert("Failed to update order status.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while updating the order status. Please try again.");
+    });
+}
+// Persist active section after refresh
+document.addEventListener("DOMContentLoaded", function () {
+    // Get the last active section from localStorage
+    const lastActiveSection = localStorage.getItem("activeSection");
+
+    if (lastActiveSection) {
+        toggleSection(lastActiveSection);
+    } else {
+        // Default section if no stored section exists
+        toggleSection("dashboard");
+    }
+});
+</script>
+</body>
+
+<footer class="text-lg-start text-white" style="background-color: #42af17">
+    <div class="container p-4 pb-0">
+        <div class="row">
+            
+            <!-- Company Logo and Name -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <div>
+                    <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                </div>
+                <div>
+                    <h2>COMPANY NAME</h2>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Company Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                <p><a href="#" class="text-white">About Us</a></p>
+                <p><a href="#" class="text-white">Careers</a></p>
+                <p><a href="#" class="text-white">Team</a></p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact and Download Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Become A Shopper</a></p>
+                
+                <p>Better Experience, Download The App</p>
+                
+                <!-- App Download Links -->
+                <div class="d-flex justify-content-center">
+                    <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                    <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact Information -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                <p><i class="bi bi-telephone"></i> +1122334455</p>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <!-- Copyright and Social Media Links -->
+        <div class="row d-flex align-items-center">
+            
+            <!-- Left spacing -->
+            <div class="col-md-4"></div>
+            
+            <!-- Copyright Notice -->
+            <div class="col-md-4 text-center">
+                <div>© 2020 Copyright:</div>
+            </div>
+            
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-md-end">
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</html>

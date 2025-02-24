@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Orders</title>
+{% load static %}  
+<link rel="stylesheet" href="{%static 'css/view_orders.css'%}">
+<link rel="icon" href="{% static 'Logo/logo1.png' %}">
+<!-- Include Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<header>
+    <div class="row text-center navbar" style="background-color: rgb(33, 182, 33);">
+        <div class="col-4 col-sm-1 nav-item">
+          <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:75%; width:75%;">
+        </div>
+        <div class="col-4 col-sm-2 text-center nav-item">
+          <a class="pulse" href="#" style="font-size: 20px;color: black;">
+            <i class="bi bi-geo-alt"></i>
+          </a>
+        </div>
+        <div class="col-4 col-sm-7 nav-item">
+          <form class="d-flex align-items-center position-relative">
+            <!-- Search Input -->
+            <input class="form-control fs-6" type="search" placeholder="Search" aria-label="Search" style="padding-right: 40px;" />
+            <span class="search_search_icon__LSw6F" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+              <img src="https://img.crofarm.com/otipyecom/assets/svg/SmallSearch.svg" alt="" >
+            </span>
+          </form>
+        </div>
+        <div class="col-4 col-sm-2 nav-item">
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="dropdown">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown" href="#" style="font-size: 25px;"><i class="bi bi-person-circle"></i></a> 
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item btn" href="{% url 'buyer_portal' %}">Home</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'view_orders' %}">Orders</a></li>
+                  <li><a class="dropdown-item btn" href="#">Bills And Payments</a></li>
+                  <li><a class="dropdown-item btn" href="#">Rewards</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'settings_buyer' id=request.session.buyer_id %}">Settings</a></li>
+                  <li><a class="dropdown-item btn" href="{% url 'logout' %}">Log Out</a></li>
+                </ul>
+              </div> 
+            </div>
+            <div class="col-6 position-relative">
+                <a class="btn position-relative" href="{% url 'view_cart' buyer_id %}" style="font-size: 20px;">
+                    <i class="bi bi-cart"></i>
+                    {% if cart_count > 0 %}
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                            {{ cart_count }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="font-size: 12px; padding: 0.25rem 0.5rem;">
+                            0
+                        </span>
+                    {% endif %}
+                </a>
+            </div>
+          </div>
+        </div>
+    </div>
+</header>
+  
+<body>
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-success text-white text-center">
+        <h2 style="font-family: Arial, sans-serif; font-size: 30px; text-align: center; padding: 10px; border-radius: 5px;">
+            Your Orders
+        </h2>    
+    </div>
+    <div class="card-body">
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-success text-white">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Grand Total</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                {% for item in order.items.all %}
+                    <tr>
+                        {% if forloop.first %}
+                        <td rowspan="{{ order.items.all|length }}">{{ order.id }}</td>
+                        <td rowspan="{{ order.items.all|length }}">{{ item.item.name }}</td>
+                        <td rowspan="{{ order.items.all|length }}">{{ item.quantity }} kg</td>
+                        {% endif %}
+                        <td>₹{{ order.grand_total }}</td>
+                        <td>{{ order.created_at|date:"d M Y, h:i A" }}</td>
+                        
+                        <td>
+                            {% if item.status == "delivered" %}
+                                <span class="badge badge-success">{{ item.status }}</span>
+                            {% elif item.status == "picked_up" %}
+                                <span class="badge badge-warning">{{ item.status }}</span>
+                            {% else %}
+                                <span class="badge badge-secondary">{{ item.status }}</span>
+                            {% endif %}
+                        </td>
+                        {% if forloop.first %}
+                        <td rowspan="{{ order.items.all|length }}">
+                            <a href="{% url 'order_confirmation' order.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                            {% if item.status == "delivered" or item.status == "picked_up" %}
+                            <p>You cannot cancel the order.</p>
+                            {% elif order.is_cancellable %}
+                                <form action="{% url 'cancel_order' order.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Cancel Order
+                                    </button>
+                                </form>
+                            {% else %}
+                                <p>Order cancellation is no longer allowed.</p>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center" role="alert">
+        <strong>No orders found!</strong> You haven’t placed any orders yet.
+    </div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Include Bootstrap 5 JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+<!-- Footer Section -->
+<footer class="text-lg-start text-white" style="background-color: #42af17">
+    <div class="container p-4 pb-0">
+        <div class="row">
+            <!-- Company Logo and Name -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <div>
+                    <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                </div>
+                <div>
+                    <h2>COMPANY NAME</h2>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Company Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                <p><a href="#" class="text-white">About Us</a></p>
+                <p><a href="#" class="text-white">Careers</a></p>
+                <p><a href="#" class="text-white">Team</a></p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact and Download Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+                
+                <p>Better Experience, Download The App</p>
+                
+                <!-- App Download Links -->
+                <div class="d-flex justify-content-center">
+                    <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                    <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact Information -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                <p><i class="bi bi-telephone"></i> +1122334455</p>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <!-- Copyright and Social Media Links -->
+        <div class="row d-flex align-items-center">
+            
+            <!-- Left spacing -->
+            <div class="col-md-4"></div>
+            
+            <!-- Copyright Notice -->
+            <div class="col-md-4 text-center">
+                <div>© 2020 Copyright:</div>
+            </div>
+            
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-md-end">
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

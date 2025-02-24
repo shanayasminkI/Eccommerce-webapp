@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="FruitNveg_Store/fnvs_app/static/css/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{%static 'css/buyer.css'%}">
+    <script type="text/javascript">
+        // Prevent back button by manipulating history
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState(null, null, window.location.href);
+        };
+      </script>
+    <title>FuritNVege Home</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Logo/logo1.png' %}">
+    
+
+</head>
+<header>
+    <div class="row text-center navbar align-items-center" style="background-color: rgb(33, 182, 33);">
+        <!-- Logo -->
+        <div class="col-2 nav-item d-flex justify-content-center">
+            <img src="{% static 'Logo/logo1.png' %}" alt="logo" class="rounded" style="height:35%; width:35%;">
+        </div>
+
+        <!-- Offcanvas Filter Button -->
+        <div class="col-1 nav-item d-flex justify-content-center">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#demo">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <!-- Filter and Location Button -->
+        <div class="col-2 nav-item d-flex justify-content-center">
+            <a class="btn text-white" href="#" style="font-size: 20px;">
+                <i class="bi bi-geo-alt"></i>
+                <span style="filter: blur(1px);">Pin Your Location</span>
+            </a>
+        </div>
+
+        <!-- Search Bar (Larger & Visible on Medium & Larger Screens) -->
+        <div class="col-5 nav-item d-none d-md-flex justify-content-center">
+            <form class="d-flex search-container w-100" method="POST">
+                    {% csrf_token %}
+                <input class="form-control" type="search" name="q" placeholder="Search" style="width: 70%;">
+                <button class="btn rounded-3 sear-btn" type="submit">Search</button>
+            </form>
+        </div>
+  
+        <!-- Search Icon (Visible on Small Screens) -->
+        <div class="col-1 nav-item d-md-none d-flex justify-content-center">
+            <button class="btn text-white" id="toggleSearch" onclick="toggleSearchBar()">
+                <i class="bi bi-search" style="font-size: 24px;"></i>
+            </button>
+        </div>
+
+        <!-- User and Cart Icons -->
+        <div class="col-2 nav-item row text-center d-flex justify-content-center">
+            <div class="col-6 dropdown">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown" href="#" style="font-size: 20px;"><i class="bi bi-person-circle"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item btn" onclick="event.preventDefault(); profile()">Profile</a></li>
+                    <li><a class="dropdown-item btn" href="{% url 'view_orders' %}">Orders</a></li>
+                    <li><a class="dropdown-item btn" href="#">Bills And Payments</a></li>
+                    <li><a class="dropdown-item btn" href="#">Rewards</a></li>
+                    <li><a class="dropdown-item btn" type="submit" onclick="event.preventDefault(); add_wishlist()">Wishlist</a></li>
+                    <li><a class="dropdown-item btn" href="{% url 'settings_buyer' id=request.session.buyer_id %}">Settings</a></li>
+                    <li><a class="dropdown-item btn" href="{% url 'logout' %}">Log Out</a></li>
+                </ul>
+            </div>
+            <div class="col-6 d-flex justify-content-center" style="position: relative;">
+                <a class="btn" href="{% url 'view_cart' %}" style="font-size: 20px; position: relative;">
+                    <i class="bi bi-cart"></i>
+                    {% if cart_count > 0 %}
+                        <span class="badge bg-danger" 
+                              style="position: absolute; top: -5px; right: -5px; font-size: 12px; padding: 0.25rem 0.5rem;">
+                            {{ cart_count }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger" 
+                              style="position: absolute; top: -5px; right: -5px; font-size: 12px; padding: 0.25rem 0.5rem;">
+                            0
+                        </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offcanvas Filter Menu -->
+    <div class="offcanvas offcanvas-start" id="demo">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Filter Items</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form method="GET" action="{% url 'buyer_portal' %}">
+                <label for="type">Type:</label>
+                <select name="type" id="type" class="form-control">
+                    <option value="">All</option>
+                    <option value="fruits" {% if category_filter == 'fruits' %}selected{% endif %}>Fruits</option>
+                    <option value="vegetables" {% if category_filter == 'vegetables' %}selected{% endif %}>Vegetables</option>
+                    <option value="exotic vegetables" {% if category_filter == 'exotic vegetables' %}selected{% endif %}>Exotic Vegetables</option>
+                    <option value="exotic fruits" {% if category_filter == 'exotic fruits' %}selected{% endif %}>Exotic Fruits</option>
+                    <option value="mashrooms" {% if category_filter == 'mashrooms' %}selected{% endif %}>Mashrooms</option>
+                    <option value="salad items" {% if category_filter == 'salad items' %}selected{% endif %}>Salad Items</option>
+                </select>
+                
+                <label for="category" class="mt-3">Category:</label>
+                <select name="category" id="category" class="form-control">
+                    <option value="">All</option>
+                    <option value="kitchen garden" {% if category_filter == 'kitchen garden' %}selected{% endif %}>Kitchen Garden</option>
+                    <option value="native farm" {% if category_filter == 'native farm' %}selected{% endif %}>Native Farm</option>
+                    <option value="imported" {% if category_filter == 'imported' %}selected{% endif %}>Imported</option>
+                    <option value="polyhouse" {% if category_filter == 'polyhouse' %}selected{% endif %}>Polyhouse</option>
+                    <option value="organic" {% if category_filter == 'organic' %}selected{% endif %}>Organic</option>
+                </select>
+                <label for="min_price" class="mt-3">Min Price:</label>
+                <input type="number" name="min_price" id="min_price" class="form-control" value="{{ min_price }}">
+
+                <label for="max_price" class="mt-3">Max Price:</label>
+                <input type="number" name="max_price" id="max_price" class="form-control" value="{{ max_price }}">
+
+                <label for="min_quantity" class="mt-3">Min Quantity:</label>
+                <input type="number" name="min_quantity" id="min_quantity" class="form-control" value="{{ min_quantity }}">
+
+                <label for="max_quantity" class="mt-3">Max Quantity:</label>
+                <input type="number" name="max_quantity" id="max_quantity" class="form-control" value="{{ max_quantity }}">
+
+                <button type="submit" class="btn btn-primary mt-4 w-100">Apply Filters</button>
+            </form>
+        </div>
+    </div>
+</header>
+<body>
+ 
+    <div class="container-fluid ">
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    
+          <div class="carousel-indicators">
+                {% for image in images %}
+                <button 
+                    type="button" 
+                    data-bs-target="#carouselExampleControls" 
+                    data-bs-slide-to="{{ forloop.counter0 }}" 
+                    class="{% if forloop.first %}active{% endif %}" 
+                    aria-current="{% if forloop.first %}true{% endif %}" 
+                    aria-label="Slide {{ forloop.counter }}">
+                </button>
+                {% endfor %}
+              </div>
+    
+          <div class="carousel-inner">
+            {% for image in images %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ image.image.url }}"  class="d-block w-100" alt="..." style="height: 350px;">   
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+          
+            
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+           
+          </button>
+        </div>
+      </div>
+
+      <div class="container mt-3 text-center">
+        <h1 style="font-size: 4.5rem; font-weight: bold;">Mega Deal Zone</h1>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <div><a href="/products-on-offer/?offer=50" class="btn"><img src="{% static 'Discount/offer .gif' %}" alt=""></a></div>
+            <div><a href="/products-on-offer/?offer=30" class="btn"><img src="{% static 'Discount/limited time (1).gif' %}" alt=""></a></div>
+            <div><a href="/products-on-offer/?offer=25" class="btn"><img src="{% static 'Discount/25%2.gif' %}" alt=""></a></div>
+        </div>
+    </div>
+
+<!-- Fruits Section -->
+<div class="container-fluid mt-3" style="background-color: #cec891;">
+    <div id="items-section">
+        <!-- Fruits Header -->
+        <div class="container mb-3" id="fruits-items">
+            <h3 class="mt-4 mb-3"><strong>Fruits</strong></h3>
+
+            <!-- Fruits Grid -->
+            <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+                {% for item in items %}
+                {% if not item.is_expired %}
+                    {% if item.type == 'fruits' %}
+                        <!-- Product Card -->
+                        <div class="col">
+                            <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                                <!-- Card Container -->
+                                <div class="card s h-100 border-1 shadow-sm rounded-4 position-relative" id="card-furit">
+                                    {% if item.offfer %}
+                                    <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        {{ item.offfer }}% Off
+                                        </span>
+                                    {% elif item.quantity == 0 %}
+                                        <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                              style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                            Out of Stock
+                                        </span>
+                                    {% endif %}
+                                    <!-- Expired Overlay -->
+                                    {% if item.is_expired %}
+                                        <div class="expired-overlay position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                                             style="background-color: rgba(0, 0, 0, 0.5); top: 0; left: 0; z-index: 20; border-radius: 10px;">
+                                            <span class="text-white fw-bold" style="font-size: 1.5rem;">Expired</span>
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Product Image Carousel -->
+                                    <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            {% for image in item.images.all %}
+                                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                    <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                         alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <!-- Carousel Controls -->
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                        </button>
+                                    </div>
+
+                                    <!-- Card Body -->
+                                    <div class="card-body text-center p-2">
+                                        <!-- Product Name -->
+                                        <p class="card-title fw-bold text-muted mb-1" style="font-size: 20px;">{{ item.name }}</p>
+                                    </div>
+
+                                    <!-- Price and Actions Section -->
+                                    <div class="card-footer  border-0 d-flex justify-content-between align-items-center p-3" style="background: transparent;">
+                                        <!-- Price Section -->
+                                        <div>
+                                            {% if item.offer_price %}
+                                                <!-- Offer Price -->
+                                                <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                    ₹{{ item.offer_price }}
+                                                </p>
+                                                <!-- Original Price -->
+                                                <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                    ₹{{ item.price_kg }}
+                                                </p>
+                                            {% else %}
+                                                <!-- Only Original Price -->
+                                                <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                    ₹{{ item.price_kg }}
+                                                </p>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Wishlist and Add-to-Cart Section -->
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <!-- Wishlist Icon -->
+                                            <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                                href="{% url 'db1_wishlist' item.id %}">
+                                                <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                                style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                                </i>
+                                            </a>
+                                            <!-- Add to Cart Button -->
+                                            {% if item.quantity > 0 %}
+                                                <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                            {% else %}
+                                                <button class="btn btn-secondary text-white rounded-pill px-4 " style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="rating">
+                                        {% for i in "12345" %}
+                                            <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                        {% endfor %}
+                                        <span class="average-rating">({{ item.average_rating }})</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+
+<!-- Vegetables Row -->
+<div class="container-fluid mt-5" style="background-color: #b6dfa7;">
+    <div class="container mb-3" id="vegetables-items">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Vegetables</strong></h3>
+
+        <!-- Vegetables Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                {% if item.type == 'vegetables' %}
+                    <!-- Product Card -->
+                    <div class="col">
+                        <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                            <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative" id="card-veg">
+                                {% if item.offfer %}
+                                <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    {{ item.offfer }}% Off
+                                    </span>
+                                {% elif item.quantity == 0 %}
+                                    <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+
+                                <!-- Product Image Carousel -->
+                                <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for image in item.images.all %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                     alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body text-center p-2">
+                                    <!-- Product Name -->
+                                    <p class="card-title fw-bold text-muted mb-1" >{{ item.name }}</p>
+                                </div>
+
+                                <!-- Price and Actions Section -->
+                                <div class="card-footer  border-0 d-flex justify-content-between align-items-center p-3">
+                                    <!-- Price Section -->
+                                    <div>
+                                        {% if item.offer_price %}
+                                            <!-- Display Offer Price and Original Price -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.offer_price }}
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% else %}
+                                            <!-- Display Only Original Price -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Wishlist Icon and Add-to-Cart Button -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <!-- Wishlist Icon -->
+                                        <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                        href="{% url 'db1_wishlist' item.id %}">
+                                        <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                        style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                        </a>
+                                        <!-- Add to Cart Button -->
+                                        {% if item.quantity > 0 %}
+                                            <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                    {% endfor %}
+                                    <span class="average-rating">({{ item.average_rating }})</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Exotic Fruits Section -->
+<div class="container-fluid mt-5" style="background-color: #d4cda2;">
+    <div class="container mb-3" id="exotic-fruits-items">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Exotic Fruits</strong></h3>
+
+        <!-- Exotic Fruits Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                {% if item.type == 'exotic fruits' %}
+                    <!-- Product Card -->
+                    <div class="col">
+                        <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                            <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative" id="card-ex-furit">
+                                
+                                {% if item.offfer %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                  style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                {{ item.offfer }}% Off
+                                    </span>
+                                {% elif item.quantity == 0 %}
+                                    <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+                               
+                                <!-- Product Image Carousel -->
+                                <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for image in item.images.all %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                     alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body text-center p-2">
+                                    <!-- Product Name -->
+                                    <p class="card-title fw-bold text-muted mb-1" >{{ item.name }}</p>
+                                </div>
+
+                                <!-- Price and Actions Section -->
+                                <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3">
+                                    <!-- Price Section -->
+                                    <div>
+                                        {% if item.offer_price %}
+                                            <!-- Offer Price with Original Price -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.offer_price }}
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% else %}
+                                            <!-- Original Price Only -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Wishlist Icon and Add-to-Cart Button -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <!-- Wishlist Icon -->
+                                        <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                        href="{% url 'db1_wishlist' item.id %}">
+                                        <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                        style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                        </a>
+                                        <!-- Add Button -->
+                                        {% if item.quantity > 0 %}
+                                            <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                    {% endfor %}
+                                    <span class="average-rating">({{ item.average_rating }})</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Exotic Vegetables Section -->
+<div class="container-fluid mt-5" style="background-color: #bce0ae;">
+    <div class="container mb-3" id="exotic-vegetables-items">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Exotic Vegetables</strong></h3>
+
+        <!-- Exotic Vegetables Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                {% if item.type == 'exotic vegetables' %}
+                    <!-- Product Card -->
+                    <div class="col">
+                        <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                            <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative" id="card-ex-veg">
+                                
+                                {% if item.offfer %}
+                                <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    {{ item.offfer }}% Off
+                                    </span>
+                                {% elif item.quantity == 0 %}
+                                    <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+                               
+
+                                <!-- Product Image Carousel -->
+                                <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for image in item.images.all %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                     alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body text-center p-2">
+                                    <!-- Product Name -->
+                                    <p class="card-title fw-bold text-muted mb-1">{{ item.name }}</p>
+                                </div>
+
+                                <!-- Price and Actions Section -->
+                                <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3">
+                                    <!-- Price Section -->
+                                    <div>
+                                        {% if item.offfer %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                  style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                {{ item.offfer }}% Off
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% else %}
+                                            <!-- Original Price Only -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Wishlist Icon and Add-to-Cart Button -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <!-- Wishlist Icon -->
+                                        <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                        href="{% url 'db1_wishlist' item.id %}">
+                                        <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                        style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                        </a>
+                                        <!-- Add Button -->
+                                        {% if item.quantity > 0 %}
+                                            <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                    {% endfor %}
+                                    <span class="average-rating">({{ item.average_rating }})</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Mushrooms Section -->
+<div class="container-fluid mt-5" style="background-color: #b5d7b7;">
+    <div class="container mb-3" id="mushrooms-items">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Mushrooms</strong></h3>
+
+        <!-- Mushrooms Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                {% if item.type == 'mashrooms' %}
+                    <!-- Product Card -->
+                    <div class="col">
+                        <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                            <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative"id="card-mushroom">
+                                
+                                {% if item.offfer %}
+                                <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    {{ item.offfer }}% Off
+                                    </span>
+                                {% elif item.quantity == 0 %}
+                                    <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+                               
+                                <!-- Product Image Carousel -->
+                                <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for image in item.images.all %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                     alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body text-center p-2">
+                                    <!-- Product Name -->
+                                    <p class="card-title fw-bold text-muted mb-1">{{ item.name }}</p>
+                                </div>
+
+                                <!-- Price and Actions Section -->
+                                <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3">
+                                    <!-- Price Section -->
+                                    <div>
+                                        {% if item.offfer_price %}
+                                            <!-- Offer Price with Original Price -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.offer_price }}
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% else %}
+                                            <!-- Original Price Only -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Wishlist Icon and Add-to-Cart Button -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <!-- Wishlist Icon -->
+                                        <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                        href="{% url 'db1_wishlist' item.id %}">
+                                        <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                        style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                        </a>
+                                        <!-- Add Button -->
+                                        {% if item.quantity > 0 %}
+                                            <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                    {% endfor %}
+                                    <span class="average-rating">({{ item.average_rating }})</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Salad Items Section -->
+<div class="container-fluid mt-5" style="background-color: #d1edc6;">
+    <div class="container mb-3" id="salad-items">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Salad Items</strong></h3>
+
+        <!-- Salad Items Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                {% if item.type == 'salad items' %}
+                    <!-- Product Card -->
+                    <div class="col">
+                        <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                            <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative" id="card-salad">
+                                
+                                {% if item.offfer %}
+                                <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                      style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                    {{ item.offfer }}% Off
+                                    </span>
+                                {% elif item.quantity == 0 %}
+                                    <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                          style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+                                <!-- Product Image Carousel -->
+                                <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for image in item.images.all %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                                     alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body text-center p-2">
+                                    <!-- Product Name -->
+                                    <p class="card-title fw-bold text-muted mb-1">{{ item.name }}</p>
+                                </div>
+
+                                <!-- Price and Actions Section -->
+                                <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3">
+                                    <!-- Price Section -->
+                                    <div>
+                                        {% if item.offer_price %}
+                                            <!-- Offer Price with Original Price -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.offer_price }}
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% else %}
+                                            <!-- Original Price Only -->
+                                            <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                                ₹{{ item.price_kg }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Wishlist Icon and Add-to-Cart Button -->
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <!-- Wishlist Icon -->
+                                        <a class="btn btn-link p-0 me-2 wishlist-icon" 
+                                        href="{% url 'db1_wishlist' item.id %}">
+                                        <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} wishlist-icon" 
+                                        style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                        </i>
+                                        </a>
+                                        <!-- Add Button -->
+                                        {% if item.quantity > 0 %}
+                                            <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                                    {% endfor %}
+                                    <span class="average-rating">({{ item.average_rating }})</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- General Products Section -->
+<div class="container-fluid mt-5" style="background-color: #b7d1b0;">
+    <div class="container mb-3">
+        <!-- Section Header -->
+        <h3 class="mt-4 mb-3"><strong>Products</strong></h3>
+
+        <!-- Products Grid -->
+        <div class="card-container row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for item in items %}
+            {% if not item.is_expired %}
+                <div class="col">
+                    <a href="{% url 'item_details' item.id %}" class="text-decoration-none">
+                    <!-- Product Card -->
+                    <div class="card {% if item.is_expired %}card-expired{% endif %} h-100 border-1 shadow-sm rounded-4 position-relative">
+                        {% if item.offfer %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 text-white"
+                                  style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                {{ item.offfer }}% Off
+                            </span>
+                        {% elif item.quantity == 0 %}
+                            <span class="badge bg-dark position-absolute top-0 start-0 text-white"
+                                  style="margin: 10px; padding: 5px 10px; font-size: 0.8rem; z-index: 10;">
+                                Out of Stock
+                            </span>
+                        {% endif %}
+
+                        <!-- Expired Overlay -->
+                        {% if item.is_expired %}
+                            <div class="expired-overlay position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                                 style="background-color: rgba(0, 0, 0, 0.5); top: 0; left: 0; z-index: 20; border-radius: 10px;">
+                                <span class="text-white fw-bold" style="font-size: 1.5rem;">Expired</span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Product Image Carousel -->
+                        <div id="carousel{{ item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for image in item.images.all %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                                             alt="{{ item.name }}" style="height: 120px; object-fit: cover;">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <!-- Carousel Controls -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="prev">
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ item.id }}" data-bs-slide="next">
+                            </button>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body text-center p-2">
+                            <!-- Product Name -->
+                            <p class="card-title fw-bold text-muted mb-1">{{ item.name }}</p>
+                        </div>
+
+                        <!-- Price and Actions Section -->
+                        <div class="card-footer border-0 d-flex justify-content-between align-items-center p-3">
+                            <!-- Price Section -->
+                            <div>
+                                {% if item.offer_price %}
+                                    <!-- Offer Price with Original Price -->
+                                    <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                        ₹{{ item.offer_price }}
+                                    </p>
+                                    <p class="text-muted text-decoration-line-through mb-0" style="font-size: 1.4rem;">
+                                        ₹{{ item.price_kg }}
+                                    </p>
+                                {% else %}
+                                    <!-- Original Price Only -->
+                                    <p class="mb-0" style="font-size: 1.5rem; font-weight: bold; color: #000;">
+                                        ₹{{ item.price_kg }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Wishlist Icon and Add-to-Cart Button -->
+                            <div class="d-flex gap-2 align-items-center">
+                                <!-- Wishlist Icon -->
+                                <a class="btn btn-link p-0 me-2" href="{% url 'db1_wishlist' item.id %}">
+                                    <i class="bi {% if item.id in request.session.wishlist %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                                       style="font-size: 20px; color: {% if item.id in request.session.wishlist %}#f00{% else %}#000{% endif %};">
+                                    </i>
+                                </a>
+                                <!-- Add-to-Cart Button -->
+                                {% if item.quantity > 0 %}
+                                    <a href="{% url 'db1_cart' item.id %}" class="btn btn-success text-white rounded-pill px-4 add-to-cart-btn" style="font-size: 0.9rem;">ADD</a>
+                                {% else %}
+                                    <button class="btn btn-secondary text-white rounded-pill px-4" style="font-size: 0.9rem;" disabled>Out of Stock</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="rating">
+                            {% for i in "12345" %}
+                                <span class="fa fa-star {% if product.average_rating >= i|add:0 %}checked{% endif %}"></span>
+                            {% endfor %}
+                            <span class="average-rating">({{ item.average_rating }})</span>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div>
+  <img src="{% static 'Logo/web_banner.png' %}" alt="" style="width: 100%; margin-top: 1%; margin-bottom: 5px;">
+</div>
+
+<!-- Profile Dropdown -->
+<div id="overlay_p" class="overlay" onclick="hideProfile()"></div>
+<div id="profile" class="profile-card position-absolute">
+    <!-- Close Button -->
+    <div id="close_div"> 
+        <button id="close_button" class="btn-close " aria-label="Close" onclick="hideProfile()"></button>
+    </div>
+
+  <div class="profile-frame">
+    <div class="profile-image-wrapper">
+        <img class="profile-image" 
+             src="{% if buyer.profile_image_buyer %}{{ buyer.profile_image_buyer.url }}{% else %}{% static 'profile/person-add.svg' %}{% endif %}" 
+             alt="Profile Image">
+    </div>
+
+    <h3 class="profile-name">{{ buyer.name }}</h3>
+    <p class="profile-info">
+        <i class="bi bi-envelope-fill icon"></i>{{ buyer.email }}
+    </p>
+    <p class="profile-info">
+        <i class="bi bi-telephone-fill icon"></i>{{ buyer.mobileNo }}
+    </p>
+    <p class="profile-info">
+        <i class="bi bi-geo-alt-fill icon"></i>{{ buyer.address }}
+    </p>
+  </div> 
+</div>
+
+
+
+<!-- Wishlist -->
+<div id="overlay2" onclick="hideWishlistPopup()"></div>
+<div id="wishlist2">
+    <div class="table-responsive wishlist-table rounded shadow p-4 bg-white">
+        <table class="table table-hover">
+          <thead class="bg-light">
+            <tr>
+              <th class="py-3">Product Name</th>
+              <th class="text-center py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+         <!-- Wishlist Items -->
+{% for wishlist_item in wishlist_items %}
+<tr class="align-middle">
+  <td>
+    <a href="{% url 'item_details' wishlist_item.id %}" class="text-decoration-none">
+    <div class="product-item d-flex align-items-center">
+      <!-- Product Image Carousel -->
+      <div id="carousel{{ wishlist_item.id }}" class="imgContainer carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% if wishlist_item.images.exists %}
+            {% for image in wishlist_item.images.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ image.image.url }}" class="d-block w-100 mt-2 rounded"
+                     alt="{{ wishlist_item.name }}" style="height: 120px; object-fit: cover;">
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="carousel-item active">
+              <img src="{% static 'placeholder.jpg' %}" class="d-block w-100 mt-2 rounded"
+                   alt="No Image Available" style="height: 120px; object-fit: cover;">
+            </div>
+          {% endif %}
+        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ wishlist_item.id }}" data-bs-slide="prev">
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ wishlist_item.id }}" data-bs-slide="next">
+        </button>
+      </div>
+      <div class="product-info ms-3">
+        <h4 class="product-title text-sm mb-1">
+          <a href="#" class="text-decoration-none text-dark">{{ wishlist_item.name }}</a>
+        </h4>
+        <div class="text-lg text-primary fw-bold mb-1">₹{{ wishlist_item.offer_price }}</div>
+        <div>
+          Availability:
+          <span
+            class="fw-bold {% if wishlist_item.quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+            {% if wishlist_item.quantity > 0 %}In Stock{% else %}Out of Stock{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+    </a>
+  </td>
+  <td class="text-center">
+    <form action="{% url 'db1_cart' wishlist_item.id %}" method="post" class="d-inline me-2">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-toggle="tooltip" title="Add to Cart">
+        Add
+      </button>
+    </form>
+    <form action="{% url 'remove_from_wishlist' wishlist_item.id %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn-close" data-toggle="tooltip" title="Remove item"></button>
+    </form>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="2" class="text-center text-muted py-4">No items in your wishlist.</td>
+</tr>
+{% endfor %}
+
+          </tbody>
+        </table>
+        <div class="d-flex justify-content-end mt-4">
+          <form action="{% url 'clear_wishlist' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-4">Clear Wishlist</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-4 text-center">
+        <button 
+          class="btn btn-secondary btn-sm rounded-pill" 
+          style="font-size: 0.875rem; padding: 5px 15px; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); border-radius: 20px; background-color: #6c757d; color: white; border: none;"
+          onclick="hideWishlistPopup()">
+          Close
+        </button>
+      </div>
+      
+      
+</div>
+  </div>
+ 
+  
+
+</body>
+
+<!-- Footer Section -->
+<footer class="text-lg-start text-white" style="background-color: #42af17">
+    <div class="container p-4 pb-0">
+        <div class="row">
+            
+            <!-- Company Logo and Name -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <div>
+                    <img src="{% static 'Logo/logo1.png' %}" alt="Company Logo" class="rounded" style="height: 35%; width: 35%;">
+                </div>
+                <div>
+                    <h2>COMPANY NAME</h2>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Company Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Company</h4>
+                <p><a href="#" class="text-white">About Us</a></p>
+                <p><a href="#" class="text-white">Careers</a></p>
+                <p><a href="#" class="text-white">Team</a></p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact and Download Links -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Get In Touch With Us</h4>
+                <p><a href="{% url 'contactUs_form' %}" class="text-white">Help & Support</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Be A Seller</a></p>
+                <p><a href="{% url 'signUp' %}" class="text-white">Become A Delivery Agent</a></p>
+                
+                <p>Better Experience, Download The App</p>
+                
+                <!-- App Download Links -->
+                <div class="d-flex justify-content-center">
+                    <a href="#"><img src="{% static 'Logo/play.png' %}" alt="Google Play" class="img-fluid me-2" style="max-height: 50px; max-width: 150px;"></a>
+                    <a href="#"><img src="{% static 'Logo/app.png' %}" alt="App Store" class="img-fluid" style="max-height: 50px; max-width: 150px;"></a>
+                </div>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none" />
+
+            <!-- Contact Information -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mt-3 text-center">
+                <h4 class="text-uppercase mb-4 font-weight-bold">Contact Us</h4>
+                <p><i class="bi bi-house"></i> VADAKKEKAD, THRISSUR, KERALA</p>
+                <p><i class="bi bi-envelope"></i> FurtiNVege@gmail.com</p>
+                <p><i class="bi bi-telephone"></i> +1122334455</p>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <!-- Copyright and Social Media Links -->
+        <div class="row d-flex align-items-center">
+            
+            <!-- Left spacing -->
+            <div class="col-md-4"></div>
+            
+            <!-- Copyright Notice -->
+            <div class="col-md-4 text-center">
+                <div>© 2020 Copyright:</div>
+            </div>
+            
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-md-end">
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-google"></i></a>
+                <a class="btn btn-outline-light btn-floating"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+function add_wishlist() {
+  const wishlistPopup = document.getElementById("wishlist2");
+  const profilePopup = document.getElementById("profile");
+  const overlay2 = document.getElementById("overlay2");
+  const overlayP = document.getElementById("overlay_p");
+
+  // Hide profile popup if open
+  profilePopup.classList.remove("show");
+  overlayP.classList.remove("show");
+
+  // Toggle wishlist popup
+  wishlistPopup.classList.toggle("show");
+  overlay2.classList.toggle("show");
+}
+
+function hideWishlistPopup() {
+  const wishlistPopup = document.getElementById("wishlist2");
+  const overlay2 = document.getElementById("overlay2");
+
+  // Hide wishlist popup
+  wishlistPopup.classList.remove("show");
+  overlay2.classList.remove("show");
+}
+
+function profile() {
+  const profilePopup = document.getElementById("profile");
+  const wishlistPopup = document.getElementById("wishlist2");
+  const overlayP = document.getElementById("overlay_p");
+  const overlay2 = document.getElementById("overlay2");
+
+  // Hide wishlist popup if open
+  wishlistPopup.classList.remove("show");
+  overlay2.classList.remove("show");
+
+  // Toggle profile popup
+  profilePopup.classList.toggle("show");
+  overlayP.classList.toggle("show");
+}
+
+function hideProfile() {
+  const profilePopup = document.getElementById("profile");
+  const overlayP = document.getElementById("overlay_p");
+
+  // Hide profile popup
+  profilePopup.classList.remove("show");
+  overlayP.classList.remove("show");
+}
+ </script>
+
+</html>
